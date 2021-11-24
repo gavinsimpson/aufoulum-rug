@@ -1,6 +1,6 @@
-# Introduction to R
+# Reading data into R
 
-## 2021-11-10
+## 2021-11-24
 
 ## Packages
 
@@ -8,7 +8,7 @@ We need the following packages
 
 ```r
 # packages needed
-pkgs <- c("ggplot2", "dplyr", "palmerpenguins")
+pkgs <- c("readr", "readxl")
 
 # install needed packages
 install.packages(pkgs, Ncpus = 2)
