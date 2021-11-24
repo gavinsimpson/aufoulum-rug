@@ -1,0 +1,343 @@
+---
+title: "Reading data into R"
+author: "Gavin Simpson"
+date: "November 24th 2021"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', 'slides.css']
+    lib_dir: libs
+    nature:
+      titleSlideClass: ['inverse','bottom','left',my-title-slide]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+      ratio: '16:9'
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+---
+class: inverse center middle subsection
+
+```{r setup, echo = FALSE, results = 'hide', message = FALSE}
+library('here')
+library('readr')
+library('readxl')
+library('tidyr')
+```
+
+# Reading data into R
+
+---
+
+# Reading data into R
+
+There are many ways to read data into and out of R &mdash; you don't need the Tidyverse for this
+
+But&hellip;
+
+* if we're following the Tidy principles, or
+* we just want a cleaner, more intuitive interface
+
+then two tidyverse packages can help **readr** and **readxl**
+
+---
+
+# readr and readxl
+
+Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+
+Data are mostly arranged in rectangular files
+
+* Plain text files (CSV, TSV, FWF) &mdash; **readr**
+
+* Excel sheets or workbooks (Binary) &mdash; **readxl**
+
+---
+class: inverse middle center subsection
+
+# Reading rectangular data with *readr*
+
+---
+class: inverse middle center subsection
+background-image: url('resources/charisse-kenion-tWe8ib-cnXY-unsplash.jpg')
+background-size: cover
+
+# The Flavours of Cacao
+
+.footnote[<a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" href="https://unsplash.com/@charissek?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge" target="_blank" rel="noopener noreferrer" title="Download free do whatever you want high-resolution photos from Charisse Kenion"><span style="display:inline-block;padding:2px 3px"><svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32"><title>unsplash-logo</title><path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z"></path></svg></span><span style="display:inline-block;padding:2px 3px">Charisse Kenion</span></a>]
+
+---
+
+# The Flavours of Cacao
+
+Download the data from: <http://bit.ly/38R4yAx>
+
+Try to get used to working with a formal structure to your projects/folders
+
+```{bash show-folder-structure, echo = FALSE}
+tree -a -c -L 1 ../project
+```
+
+---
+
+# Load Packages
+
+```{r load-packages}
+## packages
+library('here')   # easy path finding
+library('readr')  # to read the CSV data set
+library('readxl') # to read xls and xlsx files
+```
+
+---
+
+# Reading rectangular data
+
+There are a few functions to remember for reading data
+
+* reading comma delimited files &mdash; `read_csv("file.csv")`
+
+* reading semi-colon delimited files &mdash; `read_csv2("file2.csv")`
+
+* reading files with any delimiter &mdash; `read_delim("file.txt", delim = "|")`
+
+* reading tab delimited files &mdash; `read_tsv("file.tsv")`
+
+* reading fixed-width files &mdash; `read_fwf("file.fwf", col_positions = c(1, 3, 5))`
+
+* reading files white-space-separated files &mdash; `read_table("file.txt")`
+
+---
+
+# Reading rectangular data
+
+Several common, key arguments (plus some others for special cases, like *locales*)
+
+`col_names = TRUE` &mdash; `TRUE` is the default, does the first row contain the column labels
+
+`col_names = c('a', 'b', 'c')` &mdash; give the column names to use explicitly. If you do:
+
+**Must `skip = 1L` to skip reading the first row of data**
+
+You can specify a column name as missing using `NA` &mdash; replaced with `"X1"`, `"X2"` etc
+---
+
+# Reading rectangular data
+
+`col_types` is the way to tell **readr** what data to expect
+
+If not supplied **readr** will guess by reading the first `guess_max` rows
+
+Can take 1 of 3 inputs
+
+1. `NULL` &mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+
+2. A `cols()` column specification
+
+3. A string of abbreviations indicating column types
+
+---
+
+# `cols()`
+
+A list of column specifiers or *prototypes*
+
+```{r cols-example}
+cols(col_integer(), col_logical())
+```
+
+Lots of prototypes (see `?cols` for the full list)
+
+* `col_logical()` &mdash; `'l'`
+* `col_integer()` &mdash; `'i'`
+* `col_double()` &mdash; `'d'`
+* `col_character()` &mdash; `'c'`
+* `col_skip()` &mdash; `'_'` or `'-'`
+* `col_guess()` &mdash; `'?'`
+
+---
+
+# Abbreviations
+
+For data sets with many columns it is quicker to use the abbreviated form
+
+`col_types = "-iddc?"`
+
+Means
+
+* skip the first column
+* second column is an integer
+* third and fourth columns are double
+* fifth column is text/character
+* guess the sixth column
+
+---
+
+# `problems()`
+
+If **readr** encounters problems reading a file it will attempt to do it's best to read it in
+
+It will print a warning &mdash; don't ignore it!
+
+Use `problems()` to see what the problems were
+
+```{r load-cacao-bad, results = 'hide', message = FALSE}
+cacao <- read_csv(here('data', 'flavors-of-cacao.csv'))
+problems(cacao)
+```
+
+---
+
+# The Flavours of Cacao
+
+```{r load-cacao-guess}
+cacao <- read_csv(here('data', 'flavors-of-cacao.csv'),
+                  col_names = c('manufacturer', 'bean_bar_name', 'ref',
+                                'review_date', 'cocoa_pcent', 'company_location',
+                                'rating', 'bean_type', 'bean_origin'),
+                  skip = 1, na = c(' ', '', 'na'))
+```
+
+---
+
+# The Flavours of Cacao
+
+If we specify `col_types`, `read_csv()` is silent
+
+```{r load-cacao-no-guess}
+cacao <- read_csv(here('data', 'flavors-of-cacao.csv'),
+                  col_names = c('manufacturer', 'bean_bar_name', 'ref',
+                                'review_date', 'cocoa_pcent', 'company_location',
+                                'rating', 'bean_type', 'bean_origin'),
+                  skip = 1, na = c(' ', '', 'na'),
+                  col_types = 'ccddccdcc')
+```
+
+This is good! Use of `col_types` is defensive coding.
+
+If you code gets data it's not expecting it should throw and error so you can work out what went wrong
+
+---
+
+# Writing rectangular data
+
+There are a few functions to remember for writing data
+
+* writing comma delimited files &mdash; `write_csv(x, "file.csv")`
+
+* writing semi-colon delimited files &mdash; `write_csv2(x, "file2.csv")`
+
+* writing files with any delimiter &mdash; `write_delim(x, "file.txt", delim = "|")`
+
+* writing tab delimited files &mdash; `write_tsv(x, "file.tsv")`
+
+* writing CSV for excel &mdash; `write_excel_csv(x, "file.csv")`
+
+---
+
+# Writing rectangular data
+
+The first argument is the object to write to disk
+
+The second argument is the path, which includes the *filename*
+
+* `path = 'file.csv'` saves `file.csv` in the current working directory
+* `path = 'output_data/file.csv'` saves `file.csv` in folder `output_data` of the working directory
+* `path = '../output_data/file.csv'` saves `file.csv` in folder `output_data` *one level up* from working directory
+* `path = here('output_data', 'file.csv')` saves `file.csv` in `output_data` folder in the project root
+
+---
+
+# Reading a writing R objects to disk
+
+**readr** provides functions to serialize R objects to disk
+
+* `read_rds('obj.rds)` reads a serialized object from disk
+
+* `write_rds(obj, 'obj.rds')` serializes `obj` to disk
+
+---
+class: inverse middle center subsection
+
+# Reading Excel sheets
+
+---
+
+# Reading Excel sheets
+
+The **readxl** package provides a small set of functions for *reading from* Excel sheets and workbooks
+
+Three main functions
+
+1. `read_xls()` reads from older Office/Excel formatted files
+2. `read_xlsx()` reads from newer Office/Excel formatted files
+3. `read_excel()` determines which type of file you have, then call one or the other of `read_xls()` or `read_xlsx()` as needed
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Download the data from: <http://bit.ly/2OxKg7w>
+
+(The only letters are `2` and `7` in the URL)
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+To list all the sheets in a file use `excel_sheets()`
+
+```{r list-excel-sheets}
+xl_file <- here('data', 'f19ph.xlsx')
+excel_sheets(xl_file)
+```
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Say we wanted to read sheet 2, we could
+
+```{r read-sheet-2}
+plant <- read_excel(xl_file, sheet = 2)
+```
+
+or by name
+
+```{r read-sheet-2-by-name}
+plant <- read_excel(xl_file, sheet = '2. RA- Group 2')
+```
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Can use `col_types` argument to tell **readxl** what data types to expect
+
+The default is `NULL` which guess from `guess_max` rows of the data
+
+Other option is to pass it a vector of one or more of these options
+
+* `"skip"`,
+* `"guess"`,
+* `"logical"`,
+* `"numeric"`,
+* `"date"`,
+* `"text"`, or
+* `"list"`
+
+Note this is the complete list &mdash; shorter than types for **readr** and no abbreviations
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+```{r read-plant-phys-proper}
+col_types <- rep(c('text','numeric'), times = c(3, 9))
+(plant <- read_excel(xl_file, sheet = 2, col_types = col_types))
+```
+
+

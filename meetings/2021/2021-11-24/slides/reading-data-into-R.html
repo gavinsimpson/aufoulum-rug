@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Reading data into R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gavin Simpson" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: inverse, bottom, left, my-title-slide, title-slide
+
+# Reading data into R
+### Gavin Simpson
+### November 24th 2021
+
+---
+
+class: inverse center middle subsection
+
+
+
+# Reading data into R
+
+---
+
+# Reading data into R
+
+There are many ways to read data into and out of R &amp;mdash; you don't need the Tidyverse for this
+
+But&amp;hellip;
+
+* if we're following the Tidy principles, or
+* we just want a cleaner, more intuitive interface
+
+then two tidyverse packages can help **readr** and **readxl**
+
+---
+
+# readr and readxl
+
+Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+
+Data are mostly arranged in rectangular files
+
+* Plain text files (CSV, TSV, FWF) &amp;mdash; **readr**
+
+* Excel sheets or workbooks (Binary) &amp;mdash; **readxl**
+
+---
+class: inverse middle center subsection
+
+# Reading rectangular data with *readr*
+
+---
+class: inverse middle center subsection
+background-image: url('resources/charisse-kenion-tWe8ib-cnXY-unsplash.jpg')
+background-size: cover
+
+# The Flavours of Cacao
+
+.footnote[&lt;a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &amp;quot;San Francisco&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Helvetica, Ubuntu, Roboto, Noto, &amp;quot;Segoe UI&amp;quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" href="https://unsplash.com/@charissek?utm_medium=referral&amp;amp;utm_campaign=photographer-credit&amp;amp;utm_content=creditBadge" target="_blank" rel="noopener noreferrer" title="Download free do whatever you want high-resolution photos from Charisse Kenion"&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32"&gt;&lt;title&gt;unsplash-logo&lt;/title&gt;&lt;path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/span&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;Charisse Kenion&lt;/span&gt;&lt;/a&gt;]
+
+---
+
+# The Flavours of Cacao
+
+Download the data from: &lt;http://bit.ly/38R4yAx&gt;
+
+Try to get used to working with a formal structure to your projects/folders
+
+
+```
+## ../project
+## ├── data
+## ├── functions
+## ├── figures
+## ├── derived-data
+## ├── README.md
+## ├── scripts
+## ├── 01-eda.R
+## ├── 02-analyse-experiment-1.R
+## ├── manuscript
+## └── 03-analyse-experiment-2.R
+## 
+## 6 directories, 4 files
+```
+
+---
+
+# Load Packages
+
+
+```r
+## packages
+library('here')   # easy path finding
+library('readr')  # to read the CSV data set
+library('readxl') # to read xls and xlsx files
+```
+
+---
+
+# Reading rectangular data
+
+There are a few functions to remember for reading data
+
+* reading comma delimited files &amp;mdash; `read_csv("file.csv")`
+
+* reading semi-colon delimited files &amp;mdash; `read_csv2("file2.csv")`
+
+* reading files with any delimiter &amp;mdash; `read_delim("file.txt", delim = "|")`
+
+* reading tab delimited files &amp;mdash; `read_tsv("file.tsv")`
+
+* reading fixed-width files &amp;mdash; `read_fwf("file.fwf", col_positions = c(1, 3, 5))`
+
+* reading files white-space-separated files &amp;mdash; `read_table("file.txt")`
+
+---
+
+# Reading rectangular data
+
+Several common, key arguments (plus some others for special cases, like *locales*)
+
+`col_names = TRUE` &amp;mdash; `TRUE` is the default, does the first row contain the column labels
+
+`col_names = c('a', 'b', 'c')` &amp;mdash; give the column names to use explicitly. If you do:
+
+**Must `skip = 1L` to skip reading the first row of data**
+
+You can specify a column name as missing using `NA` &amp;mdash; replaced with `"X1"`, `"X2"` etc
+---
+
+# Reading rectangular data
+
+`col_types` is the way to tell **readr** what data to expect
+
+If not supplied **readr** will guess by reading the first `guess_max` rows
+
+Can take 1 of 3 inputs
+
+1. `NULL` &amp;mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+
+2. A `cols()` column specification
+
+3. A string of abbreviations indicating column types
+
+---
+
+# `cols()`
+
+A list of column specifiers or *prototypes*
+
+
+```r
+cols(col_integer(), col_logical())
+```
+
+```
+## cols(
+##   col_integer(),
+##   col_logical()
+## )
+```
+
+Lots of prototypes (see `?cols` for the full list)
+
+* `col_logical()` &amp;mdash; `'l'`
+* `col_integer()` &amp;mdash; `'i'`
+* `col_double()` &amp;mdash; `'d'`
+* `col_character()` &amp;mdash; `'c'`
+* `col_skip()` &amp;mdash; `'_'` or `'-'`
+* `col_guess()` &amp;mdash; `'?'`
+
+---
+
+# Abbreviations
+
+For data sets with many columns it is quicker to use the abbreviated form
+
+`col_types = "-iddc?"`
+
+Means
+
+* skip the first column
+* second column is an integer
+* third and fourth columns are double
+* fifth column is text/character
+* guess the sixth column
+
+---
+
+# `problems()`
+
+If **readr** encounters problems reading a file it will attempt to do it's best to read it in
+
+It will print a warning &amp;mdash; don't ignore it!
+
+Use `problems()` to see what the problems were
+
+
+```r
+cacao &lt;- read_csv(here('data', 'flavors-of-cacao.csv'))
+problems(cacao)
+```
+
+---
+
+# The Flavours of Cacao
+
+
+```r
+cacao &lt;- read_csv(here('data', 'flavors-of-cacao.csv'),
+                  col_names = c('manufacturer', 'bean_bar_name', 'ref',
+                                'review_date', 'cocoa_pcent', 'company_location',
+                                'rating', 'bean_type', 'bean_origin'),
+                  skip = 1, na = c(' ', '', 'na'))
+```
+
+```
+## Rows: 1795 Columns: 9
+```
+
+```
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (6): manufacturer, bean_bar_name, cocoa_pcent, company_location, bean_ty...
+## dbl (3): ref, review_date, rating
+```
+
+```
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+---
+
+# The Flavours of Cacao
+
+If we specify `col_types`, `read_csv()` is silent
+
+
+```r
+cacao &lt;- read_csv(here('data', 'flavors-of-cacao.csv'),
+                  col_names = c('manufacturer', 'bean_bar_name', 'ref',
+                                'review_date', 'cocoa_pcent', 'company_location',
+                                'rating', 'bean_type', 'bean_origin'),
+                  skip = 1, na = c(' ', '', 'na'),
+                  col_types = 'ccddccdcc')
+```
+
+This is good! Use of `col_types` is defensive coding.
+
+If you code gets data it's not expecting it should throw and error so you can work out what went wrong
+
+---
+
+# Writing rectangular data
+
+There are a few functions to remember for writing data
+
+* writing comma delimited files &amp;mdash; `write_csv(x, "file.csv")`
+
+* writing semi-colon delimited files &amp;mdash; `write_csv2(x, "file2.csv")`
+
+* writing files with any delimiter &amp;mdash; `write_delim(x, "file.txt", delim = "|")`
+
+* writing tab delimited files &amp;mdash; `write_tsv(x, "file.tsv")`
+
+* writing CSV for excel &amp;mdash; `write_excel_csv(x, "file.csv")`
+
+---
+
+# Writing rectangular data
+
+The first argument is the object to write to disk
+
+The second argument is the path, which includes the *filename*
+
+* `path = 'file.csv'` saves `file.csv` in the current working directory
+* `path = 'output_data/file.csv'` saves `file.csv` in folder `output_data` of the working directory
+* `path = '../output_data/file.csv'` saves `file.csv` in folder `output_data` *one level up* from working directory
+* `path = here('output_data', 'file.csv')` saves `file.csv` in `output_data` folder in the project root
+
+---
+
+# Reading a writing R objects to disk
+
+**readr** provides functions to serialize R objects to disk
+
+* `read_rds('obj.rds)` reads a serialized object from disk
+
+* `write_rds(obj, 'obj.rds')` serializes `obj` to disk
+
+---
+class: inverse middle center subsection
+
+# Reading Excel sheets
+
+---
+
+# Reading Excel sheets
+
+The **readxl** package provides a small set of functions for *reading from* Excel sheets and workbooks
+
+Three main functions
+
+1. `read_xls()` reads from older Office/Excel formatted files
+2. `read_xlsx()` reads from newer Office/Excel formatted files
+3. `read_excel()` determines which type of file you have, then call one or the other of `read_xls()` or `read_xlsx()` as needed
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Download the data from: &lt;http://bit.ly/2OxKg7w&gt;
+
+(The only letters are `2` and `7` in the URL)
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+To list all the sheets in a file use `excel_sheets()`
+
+
+```r
+xl_file &lt;- here('data', 'f19ph.xlsx')
+excel_sheets(xl_file)
+```
+
+```
+##  [1] "eg"                           "2. RA- Group 2"              
+##  [3] "3. Thursday PM Group 4"       "4. RP-Group_1"               
+##  [5] "5. RP G3"                     "6. WP - Group 5 PH data"     
+##  [7] "7. WP- group3"                "8. WP - group 4"             
+##  [9] "9. RP- Group_#6"              "10. RP-Group#2"              
+## [11] "11. RP5"                      "12. RA - Group #6 Data"      
+## [13] "13. RA3"                      "14. WP-GROUP 1"              
+## [15] "15. WP-Group #2"              "16. RA4"                     
+## [17] "17. WP6"                      "18. Pea plant pirates"       
+## [19] "19. Precinct 99 T.Y.S.T. ^_^" "20. Group 3 Friday AM"       
+## [21] "21. Perennial Millenials"     "22. F am Group 1"            
+## [23] "23. R AM Group1"              "24. RA Group 5"
+```
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Say we wanted to read sheet 2, we could
+
+
+```r
+plant &lt;- read_excel(xl_file, sheet = 2)
+```
+
+or by name
+
+
+```r
+plant &lt;- read_excel(xl_file, sheet = '2. RA- Group 2')
+```
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+Can use `col_types` argument to tell **readxl** what data types to expect
+
+The default is `NULL` which guess from `guess_max` rows of the data
+
+Other option is to pass it a vector of one or more of these options
+
+* `"skip"`,
+* `"guess"`,
+* `"logical"`,
+* `"numeric"`,
+* `"date"`,
+* `"text"`, or
+* `"list"`
+
+Note this is the complete list &amp;mdash; shorter than types for **readr** and no abbreviations
+
+---
+
+# BIOL 266 Plant Pysiology 2019
+
+
+```r
+col_types &lt;- rep(c('text','numeric'), times = c(3, 9))
+(plant &lt;- read_excel(xl_file, sheet = 2, col_types = col_types))
+```
+
+```
+## # A tibble: 24 × 12
+##    treatment cultivar plantid `height:0` `internodes:0` `height:7`
+##    &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;        &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+##  1 control   wt       1               83              4        321
+##  2 control   wt       2               67              4        277
+##  3 control   wt       3               68              4        301
+##  4 control   wt       4               64              4        265
+##  5 control   wt       5               62              4        263
+##  6 control   wt       6               60              4        244
+##  7 ga10      wt       1               50              3        220
+##  8 ga10      wt       2               62              3        212
+##  9 ga10      wt       3               54              3        213
+## 10 ga10      wt       4               46              3        182
+## # … with 14 more rows, and 6 more variables: internodes:7 &lt;dbl&gt;,
+## #   height:14 &lt;dbl&gt;, internodes:14 &lt;dbl&gt;, height:21 &lt;dbl&gt;, internodes:21 &lt;dbl&gt;,
+## #   freshwt:21 &lt;dbl&gt;
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
