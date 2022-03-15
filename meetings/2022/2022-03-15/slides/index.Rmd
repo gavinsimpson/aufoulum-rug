@@ -74,8 +74,6 @@ people
 
 There are many functions for working with data frames
 
-Table 10.1 in PS4DS lists several
-
 Useful functions include
 
 * `head()`
@@ -168,11 +166,13 @@ people[2:4, ]
 
 **Tibbles** are a modern implementation of the data frame concept
 
-Widely used in the *Tidyverse* &mdash; a collection of packages that all share common philosophy and approaches to working with data
+Widely used in the *Tidyverse* &mdash; a collection of packages that all share
+common philosophy and approaches to working with data
 
 Coerce a data frame to be a tibble with `as_tibble()` (from **tibble** 📦)
 
-Load data directly to tibbles using the **readr**, **vroom**, & **readxl** 📦📦📦
+Load data directly to tibbles using the **readr**, **vroom**, & **readxl**
+📦📦📦
 
 ---
 
@@ -279,15 +279,19 @@ To use the core *tidyverse* suite of packages in your code load the *tidyverse* 
 library('tidyverse')
 ```
 
-I don't recommend loading all the *tidyverse* this way though &mdash; you should get into the habit of loading only the packages you will use / need
+I don't recommend loading all the *tidyverse* this way though &mdash; you
+should get into the habit of loading only the packages you will use / need
 
 ---
 
 # Tidy data
 
-> Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &mdash; **Hadley Wickham**
+> Tidy datasets provide a standardized way to link the structure of a dataset
+(its physical layout) with its semantics (its meaning). &mdash; **Hadley
+Wickham**
 
-A way to arrange data that facilitates subsequent exploration, transformation, visualization, & modelling of the data where
+A way to arrange data that facilitates subsequent exploration, transformation,
+visualization, & modelling of the data where
 
 * each column is a variable
 * each row is observation
@@ -296,7 +300,8 @@ A way to arrange data that facilitates subsequent exploration, transformation, v
 
 # Reading data into R
 
-There are many ways to read data into and out of R &mdash; you don't need the Tidyverse for this
+There are many ways to read data into and out of R &mdash; you don't need the
+Tidyverse for this
 
 * `read.csv()` for example in base R
 
@@ -311,7 +316,8 @@ then two tidyverse packages can help **readr** and **readxl**
 
 # Packages 📦
 
-Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+Unless you work with huge data sets or files created by subject-specific
+software (e.g. GIS)
 
 Data are mostly arranged in rectangular files
 
@@ -319,7 +325,8 @@ Data are mostly arranged in rectangular files
 
 * Excel sheets or workbooks (Binary) &mdash; **readxl** 📦
 
-Often medical or survey data is available in SAS files for use with the SAS statistical software
+Often medical or survey data is available in SAS files for use with the SAS
+statistical software
 
 * SAS data files &mdash; **haven** 📦
 
@@ -345,15 +352,19 @@ There are a few functions to remember for reading data
 
 # Reading rectangular data
 
-Several common, key arguments (plus some others for special cases, like *locales*)
+Several common, key arguments (plus some others for special cases, like
+*locales*)
 
-`col_names = TRUE` &mdash; `TRUE` is the default, does the first row contain the column labels
+`col_names = TRUE` &mdash; `TRUE` is the default, does the first row contain
+the column labels
 
-`col_names = c('a', 'b', 'c')` &mdash; give the column names to use explicitly. If you do:
+`col_names = c('a', 'b', 'c')` &mdash; give the column names to use explicitly.
+If you do:
 
 **Must `skip = 1L` to skip reading the first row of data**
 
-You can specify a column name as missing using `NA` &mdash; replaced with `"X1"`, `"X2"` etc
+You can specify a column name as missing using `NA` &mdash; replaced with
+`"X1"`, `"X2"` etc
 
 ---
 
@@ -365,7 +376,8 @@ If not supplied **readr** will guess by reading the first `guess_max` rows
 
 Can take 1 of 3 inputs
 
-1. `NULL` &mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+1. `NULL` &mdash; the default. Guess the data types by reading the first
+    `guess_max = 1000` rows
 
 2. A `cols()` column specification
 
@@ -421,7 +433,8 @@ Means
 
 .smaller[
 ```{r load-health-bad, results = 'hide', message = TRUE}
-health <- read_csv(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+# health <- read_csv(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+health <- read_csv("https://bit.ly/cvrug-providers")
 problems(health)
 ```
 ]
@@ -515,6 +528,20 @@ health_2 <- read_excel(xl_file, sheet = 'Healthcare Providers_2')
 
 ---
 
+# Reading Excel sheets (local)
+
+As you don't have the file (yet!)
+
+```{r}
+fn <- "Healthcare Providers2.xlsx"
+hp_url <- "https://bit.ly/cvrug-providers-xls"
+download.file(hp_url, destfile = fn)
+excel_sheets(fn)
+health_2 <- read_excel(fn, sheet = 'Healthcare Providers_2')
+```
+
+---
+
 # Reading Excel sheets
 
 Can use `col_types` argument to tell **readxl** what data types to expect
@@ -531,7 +558,8 @@ Other option is to pass it a vector of one or more of these options
 * `"text"`, or
 * `"list"`
 
-Note this is the complete list &mdash; shorter than types for **readr** and no abbreviations
+Note this is the complete list &mdash; shorter than types for **readr** and no
+abbreviations
 
 ---
 
@@ -548,7 +576,8 @@ col_types <- rep(c('numeric', 'text','numeric'), times = c(2, 18, 7))
 
 The **vroom** 📦 is a part of the wider *tidyverse* of packages
 
-Can read data quickly from large files (millions or more rows) &mdash; reads data quickly because it does so lazily, only reading data when you need it
+Can read data quickly from large files (millions or more rows) &mdash; reads
+data quickly because it does so lazily, only reading data when you need it
 
 Syntax and feature similar to **readr**
 

@@ -66,8 +66,6 @@ people
 
 There are many functions for working with data frames
 
-Table 10.1 in PS4DS lists several
-
 Useful functions include
 
 * `head()`
@@ -224,11 +222,13 @@ people[2:4, ]
 
 **Tibbles** are a modern implementation of the data frame concept
 
-Widely used in the *Tidyverse* &amp;mdash; a collection of packages that all share common philosophy and approaches to working with data
+Widely used in the *Tidyverse* &amp;mdash; a collection of packages that all share
+common philosophy and approaches to working with data
 
 Coerce a data frame to be a tibble with `as_tibble()` (from **tibble** 📦)
 
-Load data directly to tibbles using the **readr**, **vroom**, &amp; **readxl** 📦📦📦
+Load data directly to tibbles using the **readr**, **vroom**, &amp; **readxl**
+📦📦📦
 
 ---
 
@@ -347,7 +347,7 @@ A meta package that installs a core set of the tidyverse packages
 
 Addresses stages in the data science workflow
 
-&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/r4ds-data-science.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/r4ds-data-science.png" style="display: block; margin: auto;" /&gt;
 
 .references[Wickham &amp; Grolemund (2017) [R for Data Science](https://r4ds.had.co.nz/)]
 
@@ -369,15 +369,19 @@ To use the core *tidyverse* suite of packages in your code load the *tidyverse* 
 library('tidyverse')
 ```
 
-I don't recommend loading all the *tidyverse* this way though &amp;mdash; you should get into the habit of loading only the packages you will use / need
+I don't recommend loading all the *tidyverse* this way though &amp;mdash; you
+should get into the habit of loading only the packages you will use / need
 
 ---
 
 # Tidy data
 
-&gt; Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &amp;mdash; **Hadley Wickham**
+&gt; Tidy datasets provide a standardized way to link the structure of a dataset
+(its physical layout) with its semantics (its meaning). &amp;mdash; **Hadley
+Wickham**
 
-A way to arrange data that facilitates subsequent exploration, transformation, visualization, &amp; modelling of the data where
+A way to arrange data that facilitates subsequent exploration, transformation,
+visualization, &amp; modelling of the data where
 
 * each column is a variable
 * each row is observation
@@ -386,7 +390,8 @@ A way to arrange data that facilitates subsequent exploration, transformation, v
 
 # Reading data into R
 
-There are many ways to read data into and out of R &amp;mdash; you don't need the Tidyverse for this
+There are many ways to read data into and out of R &amp;mdash; you don't need the
+Tidyverse for this
 
 * `read.csv()` for example in base R
 
@@ -401,7 +406,8 @@ then two tidyverse packages can help **readr** and **readxl**
 
 # Packages 📦
 
-Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+Unless you work with huge data sets or files created by subject-specific
+software (e.g. GIS)
 
 Data are mostly arranged in rectangular files
 
@@ -409,7 +415,8 @@ Data are mostly arranged in rectangular files
 
 * Excel sheets or workbooks (Binary) &amp;mdash; **readxl** 📦
 
-Often medical or survey data is available in SAS files for use with the SAS statistical software
+Often medical or survey data is available in SAS files for use with the SAS
+statistical software
 
 * SAS data files &amp;mdash; **haven** 📦
 
@@ -435,15 +442,19 @@ There are a few functions to remember for reading data
 
 # Reading rectangular data
 
-Several common, key arguments (plus some others for special cases, like *locales*)
+Several common, key arguments (plus some others for special cases, like
+*locales*)
 
-`col_names = TRUE` &amp;mdash; `TRUE` is the default, does the first row contain the column labels
+`col_names = TRUE` &amp;mdash; `TRUE` is the default, does the first row contain
+the column labels
 
-`col_names = c('a', 'b', 'c')` &amp;mdash; give the column names to use explicitly. If you do:
+`col_names = c('a', 'b', 'c')` &amp;mdash; give the column names to use explicitly.
+If you do:
 
 **Must `skip = 1L` to skip reading the first row of data**
 
-You can specify a column name as missing using `NA` &amp;mdash; replaced with `"X1"`, `"X2"` etc
+You can specify a column name as missing using `NA` &amp;mdash; replaced with
+`"X1"`, `"X2"` etc
 
 ---
 
@@ -455,7 +466,8 @@ If not supplied **readr** will guess by reading the first `guess_max` rows
 
 Can take 1 of 3 inputs
 
-1. `NULL` &amp;mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+1. `NULL` &amp;mdash; the default. Guess the data types by reading the first
+    `guess_max = 1000` rows
 
 2. A `cols()` column specification
 
@@ -520,7 +532,8 @@ Means
 .smaller[
 
 ```r
-health &lt;- read_csv(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+# health &lt;- read_csv(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+health &lt;- read_csv("https://bit.ly/cvrug-providers")
 ```
 
 ```
@@ -635,6 +648,28 @@ health_2 &lt;- read_excel(xl_file, sheet = 'Healthcare Providers_2')
 
 ---
 
+# Reading Excel sheets (local)
+
+As you don't have the file (yet!)
+
+
+```r
+fn &lt;- "Healthcare Providers2.xlsx"
+hp_url &lt;- "https://bit.ly/cvrug-providers-xls"
+download.file(hp_url, destfile = fn)
+excel_sheets(fn)
+```
+
+```
+## [1] "Healthcare Providers"   "Healthcare Providers_2"
+```
+
+```r
+health_2 &lt;- read_excel(fn, sheet = 'Healthcare Providers_2')
+```
+
+---
+
 # Reading Excel sheets
 
 Can use `col_types` argument to tell **readxl** what data types to expect
@@ -651,7 +686,8 @@ Other option is to pass it a vector of one or more of these options
 * `"text"`, or
 * `"list"`
 
-Note this is the complete list &amp;mdash; shorter than types for **readr** and no abbreviations
+Note this is the complete list &amp;mdash; shorter than types for **readr** and no
+abbreviations
 
 ---
 
@@ -692,7 +728,8 @@ col_types &lt;- rep(c('numeric', 'text','numeric'), times = c(2, 18, 7))
 
 The **vroom** 📦 is a part of the wider *tidyverse* of packages
 
-Can read data quickly from large files (millions or more rows) &amp;mdash; reads data quickly because it does so lazily, only reading data when you need it
+Can read data quickly from large files (millions or more rows) &amp;mdash; reads
+data quickly because it does so lazily, only reading data when you need it
 
 Syntax and feature similar to **readr**
 
@@ -795,7 +832,7 @@ getwd()
 ```
 
 ```
-## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides"
+## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides"
 ```
 
 ---
@@ -843,7 +880,7 @@ here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv')
 ```
 
 ```
-## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/data/medicare-healthcare-providers/Healthcare Providers.csv"
+## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/data/medicare-healthcare-providers/Healthcare Providers.csv"
 ```
 
 
@@ -1026,7 +1063,7 @@ ggplot(gbd17, aes(x = sex, y = deaths_millions, fill = cause)) +
     labs(x = NULL, y = 'Deaths (millions)', fill = NULL)
 ```
 
-![](data-wrangling_files/figure-html/gbd-2017-plot-1.svg)&lt;!-- --&gt;
+![](index_files/figure-html/gbd-2017-plot-1.svg)&lt;!-- --&gt;
 
 ---
 
@@ -1642,7 +1679,7 @@ weather
 .row[
 .col-12[
 .center[
-&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/relational-nycflights.png" width="90%" /&gt;
+&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/relational-nycflights.png" width="90%" /&gt;
 ]
 ]
 ]
@@ -1687,7 +1724,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-setup.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-setup.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1699,7 +1736,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-setup2.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-setup2.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1711,7 +1748,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1723,7 +1760,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1745,7 +1782,7 @@ class: inverse center middle big-subsection
 
 ]
 .col-4[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-outer.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1757,7 +1794,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-left.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-outer-left.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1769,7 +1806,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-right.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-outer-right.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1781,7 +1818,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-full.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-outer-full.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1793,7 +1830,7 @@ class: inverse center middle big-subsection
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-venn.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-venn.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1812,7 +1849,7 @@ Semi joins **keep** all observations in `x` that have a match in `y`
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-semi.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-semi.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1826,7 +1863,7 @@ Filtering joins never duplicate rows unlike mutating joins
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-semi-many.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-semi-many.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -1840,7 +1877,7 @@ Anti joins **drop** all observations in `x` that have a match in `y`
 
 .row[
 .col-12[
-![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-anti.png)&lt;!-- --&gt;
+![](/home/au690221/work/git/aufoulum-rug/meetings/2022/2022-03-15/slides/resources/join-anti.png)&lt;!-- --&gt;
 ]
 ]
 
