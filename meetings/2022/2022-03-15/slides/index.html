@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Wrangling</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gavin Simpson" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="all.css" type="text/css" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: inverse, middle, left, my-title-slide, title-slide
+
+# Data Wrangling
+### Gavin Simpson
+
+---
+
+
+
+
+
+# What are data frames?
+
+Data frames are R's equivalent of an Excel spreadsheet
+
+Data are arranged in rows and columns
+
+* rows &amp;mdash; observations
+
+* columns &amp;mdash; variables
+
+Data frames are really lists, where each component of the list is required to
+be a vector of the same length
+
+Each column of the data frame can be of a difference type
+
+---
+
+# Creating data frames
+
+Use the `data.frame()` function
+
+
+```r
+people &lt;- data.frame(name   = c('Ada', 'Bob', 'Chris', 'Diya', 'Emma'),
+                     height = c(64, 74, 69, 69, 71),
+                     weight = c(135, 156, 139, 144, 152))
+people
+```
+
+```
+##    name height weight
+## 1   Ada     64    135
+## 2   Bob     74    156
+## 3 Chris     69    139
+## 4  Diya     69    144
+## 5  Emma     71    152
+```
+
+---
+
+# Investigating data frames
+
+There are many functions for working with data frames
+
+Table 10.1 in PS4DS lists several
+
+Useful functions include
+
+* `head()`
+
+* `tail()`
+
+* `nrow()`
+
+* `ncol()`
+
+---
+
+# Accessing data frames
+
+Can appear complicated because data frames are lists and matrix-like objects
+
+.row[
+
+.col-6[
+List access:
+
+* `people$height`
+* `people[['height']]`
+* `people[[2]]`
+* `people[2]`
+
+Last one extracts a data frame (list) with 1 column
+
+]
+
+.col-6[
+
+
+```r
+people$height
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[['height']]
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[[2]]
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[2]
+```
+
+```
+##   height
+## 1     64
+## 2     74
+## 3     69
+## 4     69
+## 5     71
+```
+
+]
+
+]
+
+---
+
+# Accessing data frames
+
+Matrix-like access
+
+Can use:
+
+* row names and column names &amp;mdash; `people['Ada', 'height']`
+
+* row &amp; column number (index) &amp;mdash; `people[2, 3]`
+
+* mixtures &amp;mdash; `people[2, 'height']`
+
+* extracting one or more rows &amp;mdash; `people[2, ]`
+
+* extracting one or more columns &amp;mdash; `people[, 'height']`
+
+* Can use numeric, character, logical indices
+
+---
+
+# Access data frames
+
+.row[
+
+.col-6[
+
+```r
+rownames(people) &lt;- people$name
+people['Ada', ]
+```
+
+```
+##     name height weight
+## Ada  Ada     64    135
+```
+
+```r
+people[, 'height']
+```
+
+```
+## [1] 64 74 69 69 71
+```
+]
+
+.col-6[
+
+```r
+people[, c('height','weight')]
+```
+
+```
+##       height weight
+## Ada       64    135
+## Bob       74    156
+## Chris     69    139
+## Diya      69    144
+## Emma      71    152
+```
+
+```r
+people[2:4, ]
+```
+
+```
+##        name height weight
+## Bob     Bob     74    156
+## Chris Chris     69    139
+## Diya   Diya     69    144
+```
+]
+
+]
+
+---
+
+# Tibbles
+
+**Tibbles** are a modern implementation of the data frame concept
+
+Widely used in the *Tidyverse* &amp;mdash; a collection of packages that all share common philosophy and approaches to working with data
+
+Coerce a data frame to be a tibble with `as_tibble()` (from **tibble** 📦)
+
+Load data directly to tibbles using the **readr**, **vroom**, &amp; **readxl** 📦📦📦
+
+---
+
+# Tibbles
+
+
+```r
+people &lt;- tibble::as_tibble(people)
+people
+```
+
+```
+## # A tibble: 5 × 3
+##   name  height weight
+##   &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Ada       64    135
+## 2 Bob       74    156
+## 3 Chris     69    139
+## 4 Diya      69    144
+## 5 Emma      71    152
+```
+
+---
+
+# Tibbles
+
+.smaller[
+
+```r
+health
+```
+
+```
+## # A tibble: 100,000 × 27
+##      index `National Provid…` `Last Name/Org…` `First Name of…` `Middle Initia…`
+##      &lt;dbl&gt;              &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;           
+##  1 8774979         1891106191 UPADHYAYULA      SATYASREE        &lt;NA&gt;            
+##  2 3354385         1346202256 JONES            WENDY            P               
+##  3 3001884         1306820956 DUROCHER         RICHARD          W               
+##  4 7594822         1770523540 FULLARD          JASPER           &lt;NA&gt;            
+##  5  746159         1073627758 PERROTTI         ANTHONY          E               
+##  6 3443985         1346571551 PUGH             JOHN             R               
+##  7 2137027         1215943535 BRUMITT          TOM              B               
+##  8 6169160         1629160551 GALBREATH        RONALD           G               
+##  9 5086226         1518929124 BOONE            RALPH            M               
+## 10 3900718         1396781134 METWEST INC      &lt;NA&gt;             &lt;NA&gt;            
+## # … with 99,990 more rows, and 22 more variables:
+## #   `Credentials of the Provider` &lt;chr&gt;, `Gender of the Provider` &lt;chr&gt;,
+## #   `Entity Type of the Provider` &lt;chr&gt;,
+## #   `Street Address 1 of the Provider` &lt;chr&gt;,
+## #   `Street Address 2 of the Provider` &lt;chr&gt;, `City of the Provider` &lt;chr&gt;,
+## #   `Zip Code of the Provider` &lt;dbl&gt;, `State Code of the Provider` &lt;chr&gt;,
+## #   `Country Code of the Provider` &lt;chr&gt;, `Provider Type` &lt;chr&gt;, …
+```
+]
+
+
+---
+
+# Tibbles
+
+There are some differences
+
+* `people$name` extracts a vector as usual but *never* partial matches &amp;mdash; `people$nam` is an error
+
+* `people[ , 'height']` extracts a 1-column data frame &amp;mdash; `[r, c]` *never* drops empty dimensions
+
+* tibbles are much faster for large data sets
+
+* tibbles print differently &amp;mdash; never again swamp your R session by accidentally printing a large data frame
+
+---
+class: inverse middle center subsection
+
+# The Tidyverse
+
+---
+
+# The Tidyverse
+
+.row[
+
+.col-9[
+&gt; The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. &amp;mdash; **www.tidyverse.org**
+
+]
+
+.col-3[
+.center[
+![](./resources/tidyverse-logo.png)&lt;!-- --&gt;
+]
+
+]
+
+]
+
+
+---
+
+# The Tidyverse
+
+A meta package that installs a core set of the tidyverse packages
+
+* **ggplot2** &amp;mdash; graphics &amp; data viz following *The Grammar of Graphics*
+* **dplyr** &amp;mdash; a grammar of data manipulation
+* **tidyr** &amp;mdash; functions to achieve a zen-like tidy state in your data 🧘
+* **readr** &amp;mdash; fast, friendly ways to read rectangular data (`.csv`, `.tsv`, `.fwf`)
+* **purrr** &amp;mdash; enhanced functional programming replacing explicit loops
+* **tibble** &amp;mdash; a modern reimgaining of the data frame
+* **stringr** &amp;mdash; for working with strings in an easy manner
+* **forcats** &amp;mdash; for working with factors &amp; categorical variables
+
+---
+
+# The Tidyverse
+
+Addresses stages in the data science workflow
+
+&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/r4ds-data-science.png" style="display: block; margin: auto;" /&gt;
+
+.references[Wickham &amp; Grolemund (2017) [R for Data Science](https://r4ds.had.co.nz/)]
+
+---
+
+# The Tidyverse
+
+To install the suite of *tidyverse* packages use
+
+
+```r
+install.packages('tidyverse')
+```
+
+To use the core *tidyverse* suite of packages in your code load the *tidyverse* package
+
+
+```r
+library('tidyverse')
+```
+
+I don't recommend loading all the *tidyverse* this way though &amp;mdash; you should get into the habit of loading only the packages you will use / need
+
+---
+
+# Tidy data
+
+&gt; Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &amp;mdash; **Hadley Wickham**
+
+A way to arrange data that facilitates subsequent exploration, transformation, visualization, &amp; modelling of the data where
+
+* each column is a variable
+* each row is observation
+
+---
+
+# Reading data into R
+
+There are many ways to read data into and out of R &amp;mdash; you don't need the Tidyverse for this
+
+* `read.csv()` for example in base R
+
+But&amp;hellip;
+
+* if we're following the Tidy principles, or
+* we just want a cleaner, more intuitive interface
+
+then two tidyverse packages can help **readr** and **readxl**
+
+---
+
+# Packages 📦
+
+Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+
+Data are mostly arranged in rectangular files
+
+* Plain text files (CSV, TSV, FWF) &amp;mdash; **readr** 📦 or **vroom** 📦
+
+* Excel sheets or workbooks (Binary) &amp;mdash; **readxl** 📦
+
+Often medical or survey data is available in SAS files for use with the SAS statistical software
+
+* SAS data files &amp;mdash; **haven** 📦
+
+---
+
+# Reading rectangular data &amp;mdash; *readr* 📦
+
+There are a few functions to remember for reading data
+
+* reading comma delimited files &amp;mdash; `read_csv("file.csv")`
+
+* reading semi-colon delimited files &amp;mdash; `read_csv2("file2.csv")`
+
+* reading files with any delimiter &amp;mdash; `read_delim("file.txt", delim = "|")`
+
+* reading tab delimited files &amp;mdash; `read_tsv("file.tsv")`
+
+* reading fixed-width files &amp;mdash; `read_fwf("file.fwf", col_positions = c(1, 3, 5))`
+
+* reading files white-space-separated files &amp;mdash; `read_table("file.txt")`
+
+---
+
+# Reading rectangular data
+
+Several common, key arguments (plus some others for special cases, like *locales*)
+
+`col_names = TRUE` &amp;mdash; `TRUE` is the default, does the first row contain the column labels
+
+`col_names = c('a', 'b', 'c')` &amp;mdash; give the column names to use explicitly. If you do:
+
+**Must `skip = 1L` to skip reading the first row of data**
+
+You can specify a column name as missing using `NA` &amp;mdash; replaced with `"X1"`, `"X2"` etc
+
+---
+
+# Reading rectangular data
+
+`col_types` is the way to tell **readr** what data to expect
+
+If not supplied **readr** will guess by reading the first `guess_max` rows
+
+Can take 1 of 3 inputs
+
+1. `NULL` &amp;mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+
+2. A `cols()` column specification
+
+3. A string of abbreviations indicating column types
+
+---
+
+# `cols()`
+
+.row[
+
+.col-6[
+A list of column specifiers or *prototypes*
+
+
+```r
+cols(col_integer(), col_logical())
+```
+
+```
+## cols(
+##   col_integer(),
+##   col_logical()
+## )
+```
+]
+
+.col-6[
+Lots of prototypes
+
+See `?cols` for the full list
+
+* `col_logical()` &amp;mdash; `'l'`
+* `col_integer()` &amp;mdash; `'i'`
+* `col_double()` &amp;mdash; `'d'`
+* `col_character()` &amp;mdash; `'c'`
+* `col_skip()` &amp;mdash; `'_'` or `'-'`
+* `col_guess()` &amp;mdash; `'?'`
+]
+]
+
+---
+
+# Abbreviations
+
+For data sets with many columns it is quicker to use the abbreviated form
+
+`col_types = "-iddc?"`
+
+Means
+
+* skip the first column
+* second column is an integer
+* third and fourth columns are double
+* fifth column is text/character
+* guess the sixth column
+
+---
+
+# `spec()` &amp; `problems()`
+
+.smaller[
+
+```r
+health &lt;- read_csv(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+```
+
+```
+## Rows: 100000 Columns: 27
+## ── Column specification ──────────────────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (18): Last Name/Organization Name of the Provider, First Name of the Pro...
+## dbl  (2): index, National Provider Identifier
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+```r
+problems(health)
+```
+]
+
+If **readr** encounters problems reading a file it will attempt to do it's best to read it in
+
+It will print a warning &amp;mdash; don't ignore it! Use `problems()` to see what the problems were
+
+---
+
+# Writing rectangular data
+
+There are a few functions to remember for writing data
+
+* writing comma delimited files &amp;mdash; `write_csv(x, "file.csv")`
+
+* writing semi-colon delimited files &amp;mdash; `write_csv2(x, "file2.csv")`
+
+* writing files with any delimiter &amp;mdash; `write_delim(x, "file.txt", delim = "|")`
+
+* writing tab delimited files &amp;mdash; `write_tsv(x, "file.tsv")`
+
+* writing CSV for excel &amp;mdash; `write_excel_csv(x, "file.csv")`
+
+---
+
+# Writing rectangular data
+
+The first argument is the object to write to disk
+
+The second argument is the path, which includes the *filename*
+
+* `path = 'file.csv'` saves `file.csv` in the current working directory
+* `path = 'output_data/file.csv'` saves `file.csv` in folder `output_data` of the working directory
+* `path = '../output_data/file.csv'` saves `file.csv` in folder `output_data` *one level up* from working directory
+* `path = here('output_data', 'file.csv')` saves `file.csv` in `output_data` folder in the project root
+
+---
+
+# Reading a writing R objects to disk
+
+**readr** provides functions to serialize R objects to disk
+
+* `read_rds('obj.rds)` reads a serialized object from disk
+
+* `write_rds(obj, 'obj.rds')` serializes `obj` to disk
+
+---
+class: inverse middle center subsection
+
+# Reading Excel sheets
+
+---
+
+# Reading Excel sheets
+
+The **readxl** package provides a small set of functions for *reading from* Excel sheets and workbooks
+
+Three main functions
+
+1. `read_xls()` reads from older Office/Excel formatted files
+2. `read_xlsx()` reads from newer Office/Excel formatted files
+3. `read_excel()` determines which type of file you have, then call one or the other of `read_xls()` or `read_xlsx()` as needed
+
+---
+
+# Reading Excel sheets
+
+To list all the sheets in a file use `excel_sheets()`
+
+
+```r
+xl_file &lt;- here('data', 'medicare-healthcare-providers', 'Healthcare Providers.xlsx')
+excel_sheets(xl_file)
+```
+
+```
+## [1] "Healthcare Providers"   "Healthcare Providers_2"
+```
+
+---
+
+# Reading Excel sheets
+
+Say we wanted to read sheet 2, we could
+
+
+```r
+health_2 &lt;- read_excel(xl_file, sheet = 2)
+```
+
+or by name
+
+
+```r
+health_2 &lt;- read_excel(xl_file, sheet = 'Healthcare Providers_2')
+```
+
+---
+
+# Reading Excel sheets
+
+Can use `col_types` argument to tell **readxl** what data types to expect
+
+The default is `NULL` which guess from `guess_max` rows of the data
+
+Other option is to pass it a vector of one or more of these options
+
+* `"skip"`,
+* `"guess"`,
+* `"logical"`,
+* `"numeric"`,
+* `"date"`,
+* `"text"`, or
+* `"list"`
+
+Note this is the complete list &amp;mdash; shorter than types for **readr** and no abbreviations
+
+---
+
+# Reading Excel sheets
+
+
+```r
+col_types &lt;- rep(c('numeric', 'text','numeric'), times = c(2, 18, 7))
+(health_xl &lt;- read_excel(xl_file, sheet = 1, col_types = col_types))
+```
+
+```
+## # A tibble: 100,000 × 27
+##      index `National Provid…` `Last Name/Org…` `First Name of…` `Middle Initia…`
+##      &lt;dbl&gt;              &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;           
+##  1 8774979         1891106191 UPADHYAYULA      SATYASREE        &lt;NA&gt;            
+##  2 3354385         1346202256 JONES            WENDY            P               
+##  3 3001884         1306820956 DUROCHER         RICHARD          W               
+##  4 7594822         1770523540 FULLARD          JASPER           &lt;NA&gt;            
+##  5  746159         1073627758 PERROTTI         ANTHONY          E               
+##  6 3443985         1346571551 PUGH             JOHN             R               
+##  7 2137027         1215943535 BRUMITT          TOM              B               
+##  8 6169160         1629160551 GALBREATH        RONALD           G               
+##  9 5086226         1518929124 BOONE            RALPH            M               
+## 10 3900718         1396781134 METWEST INC      &lt;NA&gt;             &lt;NA&gt;            
+## # … with 99,990 more rows, and 22 more variables:
+## #   `Credentials of the Provider` &lt;chr&gt;, `Gender of the Provider` &lt;chr&gt;,
+## #   `Entity Type of the Provider` &lt;chr&gt;,
+## #   `Street Address 1 of the Provider` &lt;chr&gt;,
+## #   `Street Address 2 of the Provider` &lt;chr&gt;, `City of the Provider` &lt;chr&gt;,
+## #   `Zip Code of the Provider` &lt;chr&gt;, `State Code of the Provider` &lt;chr&gt;,
+## #   `Country Code of the Provider` &lt;chr&gt;, `Provider Type` &lt;chr&gt;, …
+```
+
+---
+
+# Reading &amp; writing large data sets
+
+The **vroom** 📦 is a part of the wider *tidyverse* of packages
+
+Can read data quickly from large files (millions or more rows) &amp;mdash; reads data quickly because it does so lazily, only reading data when you need it
+
+Syntax and feature similar to **readr**
+
+Reads delimited data and will deduce the delimiter for you
+
+---
+
+# vroom 📦
+
+.smaller[
+
+```r
+health &lt;- vroom::vroom(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+```
+
+```
+## Rows: 100000 Columns: 27
+## ── Column specification ──────────────────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (17): Last Name/Organization Name of the Provider, First Name of the Pro...
+## dbl  (7): index, National Provider Identifier, Zip Code of the Provider, Num...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+```r
+(s &lt;- spec(health)) # save the spec, can reuse
+```
+
+```
+## cols(
+##   index = col_double(),
+##   `National Provider Identifier` = col_double(),
+##   `Last Name/Organization Name of the Provider` = col_character(),
+##   `First Name of the Provider` = col_character(),
+##   `Middle Initial of the Provider` = col_character(),
+##   `Credentials of the Provider` = col_character(),
+##   `Gender of the Provider` = col_character(),
+##   `Entity Type of the Provider` = col_character(),
+##   `Street Address 1 of the Provider` = col_character(),
+##   `Street Address 2 of the Provider` = col_character(),
+##   `City of the Provider` = col_character(),
+##   `Zip Code of the Provider` = col_double(),
+##   `State Code of the Provider` = col_character(),
+##   `Country Code of the Provider` = col_character(),
+##   `Provider Type` = col_character(),
+##   `Medicare Participation Indicator` = col_character(),
+##   `Place of Service` = col_character(),
+##   `HCPCS Code` = col_character(),
+##   `HCPCS Description` = col_character(),
+##   `HCPCS Drug Indicator` = col_character(),
+##   `Number of Services` = col_number(),
+##   `Number of Medicare Beneficiaries` = col_double(),
+##   `Number of Distinct Medicare Beneficiary/Per Day Services` = col_number(),
+##   `Average Medicare Allowed Amount` = col_double(),
+##   `Average Submitted Charge Amount` = col_number(),
+##   `Average Medicare Payment Amount` = col_double(),
+##   `Average Medicare Standardized Amount` = col_double()
+## )
+```
+]
+
+---
+
+# vroom 📦
+
+If we pass the column specification to the `col_types` argument, we don't get any messages about how the data are read
+
+.smaller[
+
+```r
+health &lt;- vroom::vroom(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'),
+                       col_types = s)
+```
+]
+
+Useful if there are lots of columns and the data is read in cleanly &amp;mdash; could store the spec (`write_rds()`) &amp; load it for use in reloading the data
+
+---
+class: inverse middle center subsection
+
+# Working directory
+
+---
+
+# Working directory
+
+Throughout we've been specifying paths to files, either explicitly or via the **here** 📦
+
+It is important to know where working directory is
+
+In rstudio.cloud, R starts in the `project` folder
+
+Use `getwd()` to query the working directory
+
+
+```r
+getwd()
+```
+
+```
+## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides"
+```
+
+---
+
+# Paths
+
+Refer to files with relative paths if you want to share your work / scripts easily
+
+But you still need to consider relative to what
+
+Makes sense to always work from the same root directory for a given project
+
+You should always start R in that root directory (use RStudio projects)
+
+Refer to files as relative to the project root
+
+---
+
+# `here`
+
+.row[
+
+.col-6[
+
+Helps you build relative paths
+
+Heuristics help find the base of the project
+
+* a `.here` file
+* a file matching `[.]Rproj$`
+* a `.git` file
+* ...
+
+]
+
+.col-6[
+&lt;img src="resources/here.png" width="100%" /&gt;
+]
+
+]
+
+
+```r
+here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv')
+```
+
+```
+## [1] "/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/data/medicare-healthcare-providers/Healthcare Providers.csv"
+```
+
+
+---
+class: inverse middle center subsection
+
+# Data wrangling with **dplyr** 📦
+
+---
+
+# Data wrangling
+
+Wrangling data is (or should be) the most time-consuming aspect of a study &amp;mdash; once collected!
+
+.row[
+
+.col-7[
+*Wrangling* defined as
+
+&gt; engagement in a long, complicated dispute or argument
+
+&gt; round up, herd, or take charge of (livestock)
+
+&gt; alternative to *wangle*, to *manage to obtain (something) by persuading or cleverly manipulating someone*
+
+]
+
+.col-1[
+&amp;nbsp;
+]
+
+.col-4[
+Better alternative to
+
+* data processing
+* data munging
+* data manipulation
+* &amp;hellip;
+]
+]
+
+---
+
+# Data wrangling and *dplyr*
+
+The *dplyr* package provides **five** key functions to solve most of the data wrangling issues you'll face
+
+1. Choose observations (rows) based on values of variables (cols) &amp;mdash; `filter()`
+2. Reorder the observations (rows) &amp;mdash; `arrange()`
+3. Choose variables by name or other feature &amp;mdash; `select()`
+4. Create new variables as functions of existing ones &amp;mdash; `mutate()`
+5. Collapse many values into a single summary &amp;mdash; `summarise()`
+
+Each of these functions can be used with `group_by()` so that they affect each subset of data (group) in turn
+
+These are the key data wrangling *verbs*
+
+---
+
+# Guiding principles
+
+All verbs work in the same way, providing a consistent workflow with known outputs
+
+1. the first argument to the verbs is *always* a data frame
+
+2. subsequent arguments define what you want to with the data frame
+
+3. the result of each verb (what is returned by the function) is *always* a data frame
+
+---
+
+# Global burden of disease
+
+
+```r
+disease &lt;- read_csv(here('data', 'gbd', 'gbd.csv'))
+```
+
+
+```r
+disease
+```
+
+```
+## # A tibble: 168 × 5
+##    cause                  year sex    income       deaths_millions
+##    &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                  &lt;dbl&gt;
+##  1 Communicable diseases  1990 Female High                    0.21
+##  2 Communicable diseases  1990 Female Upper-Middle            1.15
+##  3 Communicable diseases  1990 Female Lower-Middle            4.43
+##  4 Communicable diseases  1990 Female Low                     1.51
+##  5 Communicable diseases  1990 Male   High                    0.26
+##  6 Communicable diseases  1990 Male   Upper-Middle            1.35
+##  7 Communicable diseases  1990 Male   Lower-Middle            4.73
+##  8 Communicable diseases  1990 Male   Low                     1.72
+##  9 Injuries               1990 Female High                    0.2 
+## 10 Injuries               1990 Female Upper-Middle            0.55
+## # … with 158 more rows
+```
+
+---
+
+# `filter()`
+
+Subset observations based on the values or one or more of the columns
+
+
+```r
+filter(disease, year == 2017)
+```
+
+```
+## # A tibble: 24 × 5
+##    cause                  year sex    income       deaths_millions
+##    &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                  &lt;dbl&gt;
+##  1 Communicable diseases  2017 Female High                    0.26
+##  2 Communicable diseases  2017 Female Upper-Middle            0.55
+##  3 Communicable diseases  2017 Female Lower-Middle            2.92
+##  4 Communicable diseases  2017 Female Low                     1.18
+##  5 Communicable diseases  2017 Male   High                    0.29
+##  6 Communicable diseases  2017 Male   Upper-Middle            0.73
+##  7 Communicable diseases  2017 Male   Lower-Middle            3.1 
+##  8 Communicable diseases  2017 Male   Low                     1.35
+##  9 Injuries               2017 Female High                    0.21
+## 10 Injuries               2017 Female Upper-Middle            0.43
+## # … with 14 more rows
+```
+
+---
+
+# The pipe `%&gt;%`
+
+The nature of *dplyr* verbs leads to a workflow where we create intermediate steps
+
+1. group the data using `group_by()`
+2. summarise the grouped data by group using `summarise()`
+
+We perhaps don't need to store the output of the first operation
+
+The pipe operator `%&gt;%` allows use to compose *dplyr* verbs into a workflow to achieve a data wrangling outcome
+
+---
+
+# Plot
+
+
+```r
+gbd17 &lt;- disease %&gt;% filter(year == 2017) %&gt;%
+    mutate(income = fct_relevel(income,
+                                'Low', 'Lower-Middle',
+                                'Upper-Middle', 'High'))
+gbd17
+```
+
+```
+## # A tibble: 24 × 5
+##    cause                  year sex    income       deaths_millions
+##    &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;  &lt;fct&gt;                  &lt;dbl&gt;
+##  1 Communicable diseases  2017 Female High                    0.26
+##  2 Communicable diseases  2017 Female Upper-Middle            0.55
+##  3 Communicable diseases  2017 Female Lower-Middle            2.92
+##  4 Communicable diseases  2017 Female Low                     1.18
+##  5 Communicable diseases  2017 Male   High                    0.29
+##  6 Communicable diseases  2017 Male   Upper-Middle            0.73
+##  7 Communicable diseases  2017 Male   Lower-Middle            3.1 
+##  8 Communicable diseases  2017 Male   Low                     1.35
+##  9 Injuries               2017 Female High                    0.21
+## 10 Injuries               2017 Female Upper-Middle            0.43
+## # … with 14 more rows
+```
+
+---
+
+
+```r
+ggplot(gbd17, aes(x = sex, y = deaths_millions, fill = cause)) +
+    geom_col(position = 'dodge') +
+    facet_wrap(~ income, ncol = 4) +
+    theme(legend.position = 'top') +
+    labs(x = NULL, y = 'Deaths (millions)', fill = NULL)
+```
+
+![](data-wrangling_files/figure-html/gbd-2017-plot-1.svg)&lt;!-- --&gt;
+
+---
+
+# `arrange()`
+
+Sort the rows according to a condition or variable
+
+
+```r
+arrange(disease, deaths_millions)
+```
+
+```
+## # A tibble: 168 × 5
+##    cause     year sex    income deaths_millions
+##    &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;            &lt;dbl&gt;
+##  1 Injuries  1990 Female Low               0.11
+##  2 Injuries  1995 Female Low               0.11
+##  3 Injuries  2005 Female Low               0.11
+##  4 Injuries  2015 Female Low               0.12
+##  5 Injuries  2017 Female Low               0.12
+##  6 Injuries  2000 Female Low               0.13
+##  7 Injuries  2000 Female High              0.19
+##  8 Injuries  2005 Female High              0.19
+##  9 Injuries  2010 Female High              0.19
+## 10 Injuries  1990 Female High              0.2 
+## # … with 158 more rows
+```
+
+---
+
+# `desc()`
+
+Arrange in descending order using `desc()`
+
+
+```r
+arrange(disease, desc(deaths_millions))
+```
+
+```
+## # A tibble: 168 × 5
+##    cause                      year sex    income       deaths_millions
+##    &lt;chr&gt;                     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                  &lt;dbl&gt;
+##  1 Non-communicable diseases  2017 Male   Upper-Middle            8.79
+##  2 Non-communicable diseases  2015 Male   Upper-Middle            8.41
+##  3 Non-communicable diseases  2010 Male   Upper-Middle            7.65
+##  4 Non-communicable diseases  2017 Male   Lower-Middle            7.3 
+##  5 Non-communicable diseases  2017 Female Upper-Middle            7.28
+##  6 Non-communicable diseases  2005 Male   Upper-Middle            7.18
+##  7 Non-communicable diseases  2015 Female Upper-Middle            7.08
+##  8 Non-communicable diseases  2015 Male   Lower-Middle            6.98
+##  9 Non-communicable diseases  2000 Male   Upper-Middle            6.63
+## 10 Non-communicable diseases  2010 Female Upper-Middle            6.38
+## # … with 158 more rows
+```
+
+---
+
+# `select()`
+
+Choose which variables to view or work with
+
+
+```r
+select(disease, c(year, sex, income))
+```
+
+```
+## # A tibble: 168 × 3
+##     year sex    income      
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;       
+##  1  1990 Female High        
+##  2  1990 Female Upper-Middle
+##  3  1990 Female Lower-Middle
+##  4  1990 Female Low         
+##  5  1990 Male   High        
+##  6  1990 Male   Upper-Middle
+##  7  1990 Male   Lower-Middle
+##  8  1990 Male   Low         
+##  9  1990 Female High        
+## 10  1990 Female Upper-Middle
+## # … with 158 more rows
+```
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`matches()`
+
+
+```r
+select(disease, matches('deaths'))
+```
+
+```
+## # A tibble: 168 × 1
+##    deaths_millions
+##              &lt;dbl&gt;
+##  1            0.21
+##  2            1.15
+##  3            4.43
+##  4            1.51
+##  5            0.26
+##  6            1.35
+##  7            4.73
+##  8            1.72
+##  9            0.2 
+## 10            0.55
+## # … with 158 more rows
+```
+]
+
+.col-6[
+
+`last_col()`
+
+
+```r
+select(disease, last_col())
+```
+
+```
+## # A tibble: 168 × 1
+##    deaths_millions
+##              &lt;dbl&gt;
+##  1            0.21
+##  2            1.15
+##  3            4.43
+##  4            1.51
+##  5            0.26
+##  6            1.35
+##  7            4.73
+##  8            1.72
+##  9            0.2 
+## 10            0.55
+## # … with 158 more rows
+```
+]
+]
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`from:to`
+
+
+```r
+select(disease, year:income)
+```
+
+```
+## # A tibble: 168 × 3
+##     year sex    income      
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;       
+##  1  1990 Female High        
+##  2  1990 Female Upper-Middle
+##  3  1990 Female Lower-Middle
+##  4  1990 Female Low         
+##  5  1990 Male   High        
+##  6  1990 Male   Upper-Middle
+##  7  1990 Male   Lower-Middle
+##  8  1990 Male   Low         
+##  9  1990 Female High        
+## 10  1990 Female Upper-Middle
+## # … with 158 more rows
+```
+]
+
+.col-6[
+
+`starts_with()`
+
+
+```r
+select(disease, starts_with('i'))
+```
+
+```
+## # A tibble: 168 × 1
+##    income      
+##    &lt;chr&gt;       
+##  1 High        
+##  2 Upper-Middle
+##  3 Lower-Middle
+##  4 Low         
+##  5 High        
+##  6 Upper-Middle
+##  7 Lower-Middle
+##  8 Low         
+##  9 High        
+## 10 Upper-Middle
+## # … with 158 more rows
+```
+]
+]
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+Many options for choosing columns in `select` &amp;mdash; see `?dplyr::select`
+
+---
+
+# `summarise()`
+
+Summarise data to a single row
+
+
+```r
+disease %&gt;% summarise(total_deaths = sum(deaths_millions))
+```
+
+```
+## # A tibble: 1 × 1
+##   total_deaths
+##          &lt;dbl&gt;
+## 1         360.
+```
+
+---
+
+# `group_by()`
+
+`summarise()` becomes much more useful if we group data first
+
+
+```r
+disease %&gt;%
+    group_by(cause) %&gt;%
+    summarise(total_deaths = sum(deaths_millions))
+```
+
+```
+## # A tibble: 3 × 2
+##   cause                     total_deaths
+##   &lt;chr&gt;                            &lt;dbl&gt;
+## 1 Communicable diseases             92.9
+## 2 Injuries                          31.4
+## 3 Non-communicable diseases        235.
+```
+
+---
+
+# `group_by()`
+
+Can group by multiple variables; grouping applied in the order given
+
+
+```r
+disease %&gt;%
+    group_by(cause, sex) %&gt;%
+    summarise(total_deaths = sum(deaths_millions))
+```
+
+```
+## # A tibble: 6 × 3
+## # Groups:   cause [3]
+##   cause                     sex    total_deaths
+##   &lt;chr&gt;                     &lt;chr&gt;         &lt;dbl&gt;
+## 1 Communicable diseases     Female        44.2 
+## 2 Communicable diseases     Male          48.8 
+## 3 Injuries                  Female         9.98
+## 4 Injuries                  Male          21.5 
+## 5 Non-communicable diseases Female       111.  
+## 6 Non-communicable diseases Male         125.
+```
+
+---
+
+# `mutate()`
+
+Create new variable or modify existing ones
+
+
+```r
+disease %&gt;%
+    group_by(cause, sex) %&gt;%
+    summarise(deaths_per_group = sum(deaths_millions),
+              .groups = "keep") %&gt;%
+*   mutate(deaths_total = sum(deaths_per_group)) %&gt;%
+    ungroup()
+```
+
+```
+## # A tibble: 6 × 4
+##   cause                     sex    deaths_per_group deaths_total
+##   &lt;chr&gt;                     &lt;chr&gt;             &lt;dbl&gt;        &lt;dbl&gt;
+## 1 Communicable diseases     Female            44.2         44.2 
+## 2 Communicable diseases     Male              48.8         48.8 
+## 3 Injuries                  Female             9.98         9.98
+## 4 Injuries                  Male              21.5         21.5 
+## 5 Non-communicable diseases Female           111.         111.  
+## 6 Non-communicable diseases Male             125.         125.
+```
+
+---
+class: inverse middle center subsection
+
+# Tidying data with *tidyr*
+
+---
+
+# Tidy data
+
+&gt; Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &amp;ndash; **Hadley Wickham**
+
+A way to arrange data that facilitates subsequent exploration, transformation, visualization, &amp; modelling of the data where
+
+* each column is a variable
+* each row is observation
+
+---
+
+# Wide or long?
+
+Look at an alternative way of storing the GBD data
+
+
+```
+## # A tibble: 12 × 16
+##    cause              income `Female:1990` `Male:1990` `Female:1995` `Male:1995`
+##    &lt;chr&gt;              &lt;chr&gt;          &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1 Communicable dise… High            0.21        0.26          0.22        0.29
+##  2 Communicable dise… Upper…          1.15        1.35          0.94        1.18
+##  3 Communicable dise… Lower…          4.43        4.73          4.26        4.57
+##  4 Communicable dise… Low             1.51        1.72          1.73        1.92
+##  5 Injuries           High            0.2         0.42          0.2         0.42
+##  6 Injuries           Upper…          0.55        1.21          0.58        1.39
+##  7 Injuries           Lower…          0.55        0.99          0.57        1.04
+##  8 Injuries           Low             0.11        0.22          0.11        0.22
+##  9 Non-communicable … High            3.73        3.78          3.9         3.89
+## 10 Non-communicable … Upper…          4.98        5.39          5.47        6.21
+## 11 Non-communicable … Lower…          3.49        4.11          3.86        4.58
+## 12 Non-communicable … Low             0.6         0.63          0.66        0.7 
+## # … with 10 more variables: `Female:2000` &lt;dbl&gt;, `Male:2000` &lt;dbl&gt;,
+## #   `Female:2005` &lt;dbl&gt;, `Male:2005` &lt;dbl&gt;, `Female:2010` &lt;dbl&gt;,
+## #   `Male:2010` &lt;dbl&gt;, `Female:2015` &lt;dbl&gt;, `Male:2015` &lt;dbl&gt;,
+## #   `Female:2017` &lt;dbl&gt;, `Male:2017` &lt;dbl&gt;
+```
+
+---
+
+# Wide or long?
+
+The data are also in what we call wide format &amp;mdash; where multiple observations are in a row
+
+To fit a statistical model we need them in long format &amp;mdash; where each row corresponds to a single observation
+
+---
+
+# Wide or long?
+
+&lt;img src="resources/original-dfs-tidy.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Pivoting
+
+Converting between a *wide* and *long* representations is called *pivoting*
+
+&lt;img src="resources/tidyr-longer-wider.gif" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# `gather()` &amp; `spread()`
+
+An earlier implementation in *tidyr* 📦 used
+
+* `gather()`
+* `spread()`
+
+roughly corresponding to 
+
+* `pivot_longer()`
+* `pivot_wider()`
+
+The `pivot_*()` functions are to be preferred now
+
+---
+
+# `pivot_longer()`
+
+To go from the wide version of `disease` to the long form we use `pivot_longer()`
+
+
+```r
+disease_wide %&gt;%
+    pivot_longer(matches('Female|Male'), # matches any column with 'Female' or 'Male' in name
+                 names_to = c('sex', 'year'), # variables to create in long form
+                 values_to = 'deaths_millions', # column to put the data into
+                 names_sep = ':')               # how to split names_to columns?
+```
+
+```
+## # A tibble: 168 × 5
+##    cause                 income sex    year  deaths_millions
+##    &lt;chr&gt;                 &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;           &lt;dbl&gt;
+##  1 Communicable diseases High   Female 1990             0.21
+##  2 Communicable diseases High   Male   1990             0.26
+##  3 Communicable diseases High   Female 1995             0.22
+##  4 Communicable diseases High   Male   1995             0.29
+##  5 Communicable diseases High   Female 2000             0.23
+##  6 Communicable diseases High   Male   2000             0.25
+##  7 Communicable diseases High   Female 2005             0.23
+##  8 Communicable diseases High   Male   2005             0.25
+##  9 Communicable diseases High   Female 2010             0.24
+## 10 Communicable diseases High   Male   2010             0.25
+## # … with 158 more rows
+```
+
+---
+
+# `pivot_wider()`
+
+Wider forms of data tend to be easier for humans to work with outside R
+
+
+
+```r
+disease %&gt;%
+    pivot_wider(names_from = c(sex, year),     # which columns to spread out
+                values_from = deaths_millions, # which column to take data from
+                names_sep = ':') %&gt;%           # how split names_from columns?
+    head()                                     # show just first 6 rows
+```
+
+```
+## # A tibble: 6 × 16
+##   cause income `Female:1990` `Male:1990` `Female:1995` `Male:1995` `Female:2000`
+##   &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Comm… High            0.21        0.26          0.22        0.29          0.23
+## 2 Comm… Upper…          1.15        1.35          0.94        1.18          0.83
+## 3 Comm… Lower…          4.43        4.73          4.26        4.57          4.17
+## 4 Comm… Low             1.51        1.72          1.73        1.92          1.83
+## 5 Inju… High            0.2         0.42          0.2         0.42          0.19
+## 6 Inju… Upper…          0.55        1.21          0.58        1.39          0.51
+## # … with 9 more variables: `Male:2000` &lt;dbl&gt;, `Female:2005` &lt;dbl&gt;,
+## #   `Male:2005` &lt;dbl&gt;, `Female:2010` &lt;dbl&gt;, `Male:2010` &lt;dbl&gt;,
+## #   `Female:2015` &lt;dbl&gt;, `Male:2015` &lt;dbl&gt;, `Female:2017` &lt;dbl&gt;,
+## #   `Male:2017` &lt;dbl&gt;
+```
+
+---
+class: inverse center middle subsection
+
+# Relational Data
+
+---
+
+# New York Flights
+
+**nycflights13** contains five tables
+
+1. `flights`
+2. `airlines`
+3. `airports`
+4. `planes`
+5. `weather`
+
+---
+
+# New York Flights
+
+
+```r
+flights
+```
+
+```
+## # A tibble: 336,776 × 19
+##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
+##  1  2013     1     1      517            515         2      830            819
+##  2  2013     1     1      533            529         4      850            830
+##  3  2013     1     1      542            540         2      923            850
+##  4  2013     1     1      544            545        -1     1004           1022
+##  5  2013     1     1      554            600        -6      812            837
+##  6  2013     1     1      554            558        -4      740            728
+##  7  2013     1     1      555            600        -5      913            854
+##  8  2013     1     1      557            600        -3      709            723
+##  9  2013     1     1      557            600        -3      838            846
+## 10  2013     1     1      558            600        -2      753            745
+## # … with 336,766 more rows, and 11 more variables: arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;
+```
+
+---
+
+# New York Flights
+
+
+```r
+airlines
+```
+
+```
+## # A tibble: 16 × 2
+##    carrier name                       
+##    &lt;chr&gt;   &lt;chr&gt;                      
+##  1 9E      Endeavor Air Inc.          
+##  2 AA      American Airlines Inc.     
+##  3 AS      Alaska Airlines Inc.       
+##  4 B6      JetBlue Airways            
+##  5 DL      Delta Air Lines Inc.       
+##  6 EV      ExpressJet Airlines Inc.   
+##  7 F9      Frontier Airlines Inc.     
+##  8 FL      AirTran Airways Corporation
+##  9 HA      Hawaiian Airlines Inc.     
+## 10 MQ      Envoy Air                  
+## 11 OO      SkyWest Airlines Inc.      
+## 12 UA      United Air Lines Inc.      
+## 13 US      US Airways Inc.            
+## 14 VX      Virgin America             
+## 15 WN      Southwest Airlines Co.     
+## 16 YV      Mesa Airlines Inc.
+```
+
+---
+
+# New York Flights
+
+
+```r
+airports
+```
+
+```
+## # A tibble: 1,458 × 8
+##    faa   name                             lat    lon   alt    tz dst   tzone    
+##    &lt;chr&gt; &lt;chr&gt;                          &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    
+##  1 04G   Lansdowne Airport               41.1  -80.6  1044    -5 A     America/…
+##  2 06A   Moton Field Municipal Airport   32.5  -85.7   264    -6 A     America/…
+##  3 06C   Schaumburg Regional             42.0  -88.1   801    -6 A     America/…
+##  4 06N   Randall Airport                 41.4  -74.4   523    -5 A     America/…
+##  5 09J   Jekyll Island Airport           31.1  -81.4    11    -5 A     America/…
+##  6 0A9   Elizabethton Municipal Airport  36.4  -82.2  1593    -5 A     America/…
+##  7 0G6   Williams County Airport         41.5  -84.5   730    -5 A     America/…
+##  8 0G7   Finger Lakes Regional Airport   42.9  -76.8   492    -5 A     America/…
+##  9 0P2   Shoestring Aviation Airfield    39.8  -76.6  1000    -5 U     America/…
+## 10 0S9   Jefferson County Intl           48.1 -123.    108    -8 A     America/…
+## # … with 1,448 more rows
+```
+
+---
+
+# New York Flights
+
+
+```r
+planes
+```
+
+```
+## # A tibble: 3,322 × 9
+##    tailnum  year type              manufacturer model engines seats speed engine
+##    &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;        &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; 
+##  1 N10156   2004 Fixed wing multi… EMBRAER      EMB-…       2    55    NA Turbo…
+##  2 N102UW   1998 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  3 N103US   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  4 N104UW   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  5 N10575   2002 Fixed wing multi… EMBRAER      EMB-…       2    55    NA Turbo…
+##  6 N105UW   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  7 N107US   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  8 N108UW   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+##  9 N109UW   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+## 10 N110UW   1999 Fixed wing multi… AIRBUS INDU… A320…       2   182    NA Turbo…
+## # … with 3,312 more rows
+```
+
+---
+
+# New York Flights
+
+
+```r
+weather
+```
+
+```
+## # A tibble: 26,115 × 15
+##    origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
+##    &lt;chr&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1 EWR     2013     1     1     1  39.0  26.1  59.4      270      10.4 
+##  2 EWR     2013     1     1     2  39.0  27.0  61.6      250       8.06
+##  3 EWR     2013     1     1     3  39.0  28.0  64.4      240      11.5 
+##  4 EWR     2013     1     1     4  39.9  28.0  62.2      250      12.7 
+##  5 EWR     2013     1     1     5  39.0  28.0  64.4      260      12.7 
+##  6 EWR     2013     1     1     6  37.9  28.0  67.2      240      11.5 
+##  7 EWR     2013     1     1     7  39.0  28.0  64.4      240      15.0 
+##  8 EWR     2013     1     1     8  39.9  28.0  62.2      250      10.4 
+##  9 EWR     2013     1     1     9  39.9  28.0  62.2      260      15.0 
+## 10 EWR     2013     1     1    10  41    28.0  59.6      260      13.8 
+## # … with 26,105 more rows, and 5 more variables: wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;,
+## #   pressure &lt;dbl&gt;, visib &lt;dbl&gt;, time_hour &lt;dttm&gt;
+```
+
+---
+
+# New York Flights
+.row[
+.col-12[
+.center[
+&lt;img src="/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/relational-nycflights.png" width="90%" /&gt;
+]
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+class: inverse center middle subsection
+
+# Keys
+
+---
+
+# Keys
+
+Variables that connect each pair of tables are called **keys**
+
+Each plane is uniquely identified by the `tailnum`
+
+Two types of *key*
+
+1. **Primary key** &amp;mdash; uniquely identifies an observation in it's own table
+    `planes$tailnum`
+2. **Foreign key** &amp;mdash; uniquely identifies an observation in another table
+    `flights$tailnum`
+
+*Surrogate keys* are keys that are created when a table doesn't have one or more variables that uniquely identify an observation
+
+
+```r
+mutate(tbl, id = row_number())
+```
+
+---
+class: inverse center middle big-subsection
+
+# Joins
+
+---
+
+# Mutating joins
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-setup.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Joins
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-setup2.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Joins
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Inner Join
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-inner.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Outer Joins
+
+.row[
+
+.col-8[
+
+* **left join**
+
+* **right join**
+
+* **full join**
+
+]
+.col-4[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Left Join
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-left.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Right Join
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-right.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Full Join
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-outer-full.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Outer Joins
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-venn.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+class: inverse center middle subsection
+
+# Filtering joins
+
+---
+
+# Semi Joins
+
+Semi joins **keep** all observations in `x` that have a match in `y`
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-semi.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Semi Joins
+
+Filtering joins never duplicate rows unlike mutating joins
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-semi-many.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+
+# Anti Joins
+
+Anti joins **drop** all observations in `x` that have a match in `y`
+
+.row[
+.col-12[
+![](/home/au690221/work/git/aufoulum-rug/meetings/2021/2022-03-15/slides/resources/join-anti.png)&lt;!-- --&gt;
+]
+]
+
+.small[Source: Wickham &amp; Grolemund *R for Data Science*]
+
+---
+class: inverse middle center big-subsection
+
+# Examples
+
+---
+
+# ER injuries
+
+ER injuries data set consists of three tables of data
+
+
+```r
+injuries &lt;- vroom::vroom('data/er-injuries/injuries.tsv.gz')
+injuries
+```
+
+```
+## # A tibble: 255,064 × 10
+##    trmt_date    age sex    race       body_part  diag  location prod_code weight
+##    &lt;date&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;
+##  1 2017-01-01    71 male   white      Upper Tru… Cont… Other P…      1807   77.7
+##  2 2017-01-01    16 male   white      Lower Arm  Burn… Home           676   77.7
+##  3 2017-01-01    58 male   white      Upper Tru… Cont… Home           649   77.7
+##  4 2017-01-01    21 male   white      Lower Tru… Stra… Home          4076   77.7
+##  5 2017-01-01    54 male   white      Head       Inte… Other P…      1807   77.7
+##  6 2017-01-01    21 male   white      Hand       Frac… Home          1884   77.7
+##  7 2017-01-01    35 female not stated Lower Tru… Stra… Home          1807   87.1
+##  8 2017-01-01    62 female not stated Lower Arm  Lace… Home          4074   87.1
+##  9 2017-01-01    22 male   not stated Knee       Disl… Home          4076   87.1
+## 10 2017-01-01    58 female not stated Lower Leg  Frac… Home          1842   87.1
+## # … with 255,054 more rows, and 1 more variable: narrative &lt;chr&gt;
+```
+
+---
+
+# ER injuries &amp;mdash; products
+
+
+
+```r
+products &lt;- vroom::vroom('data/er-injuries/products.tsv')
+products
+```
+
+```
+## # A tibble: 38 × 2
+##    prod_code title                                   
+##        &lt;dbl&gt; &lt;chr&gt;                                   
+##  1       464 knives, not elsewhere classified        
+##  2       474 tableware and accessories               
+##  3       604 desks, chests, bureaus or buffets       
+##  4       611 bathtubs or showers                     
+##  5       649 toilets                                 
+##  6       676 rugs or carpets, not specified          
+##  7       679 sofas, couches, davenports, divans or st
+##  8      1141 containers, not specified               
+##  9      1200 sports or recreational activity, n.e.c. 
+## 10      1205 basketball (activity, apparel or equip.)
+## # … with 28 more rows
+```
+---
+
+# ER injuries &amp;mdash; population
+
+
+
+```r
+population &lt;- vroom::vroom('data/er-injuries/population.tsv')
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+
+---
+
+# ER injuries
+
+.row[
+
+.col-6[
+
+```r
+selected &lt;- injuries %&gt;%
+    filter(prod_code == 1842)
+selected %&gt;% 
+    count(age, sex, wt = weight)
+```
+
+```
+## # A tibble: 204 × 3
+##      age sex         n
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
+##  1     0 female  3714.
+##  2     0 male    3981.
+##  3     1 female 12155.
+##  4     1 male   12898.
+##  5     2 female  6949.
+##  6     2 male    9730.
+##  7     3 female  4542.
+##  8     3 male    8404.
+##  9     4 female  3618.
+## 10     4 male    4845.
+## # … with 194 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+]
+
+---
+
+# ER injuries &amp;mdash; left join
+
+One row per result of `count()`
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;%
+    count(age, sex, wt = weight) %&gt;% 
+  left_join(population, by = c("age", "sex"))
+```
+
+```
+## # A tibble: 204 × 4
+##      age sex         n population
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+##  1     0 female  3714.    1924145
+##  2     0 male    3981.    2015150
+##  3     1 female 12155.    1943534
+##  4     1 male   12898.    2031718
+##  5     2 female  6949.    1965150
+##  6     2 male    9730.    2056625
+##  7     3 female  4542.    1956281
+##  8     3 male    8404.    2050474
+##  9     4 female  3618.    1953782
+## 10     4 male    4845.    2042001
+## # … with 194 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; left join
+
+One row per result of `count()`
+
+.row[
+
+.col-12[
+
+```r
+injuries %&gt;% 
+    left_join(products, by = 'prod_code') %&gt;%
+    select(c(trmt_date:sex, prod_code, title))
+```
+
+```
+## # A tibble: 255,064 × 5
+##    trmt_date    age sex    prod_code title                                   
+##    &lt;date&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;                                   
+##  1 2017-01-01    71 male        1807 floors or flooring materials            
+##  2 2017-01-01    16 male         676 rugs or carpets, not specified          
+##  3 2017-01-01    58 male         649 toilets                                 
+##  4 2017-01-01    21 male        4076 beds or bedframes, other or not spec    
+##  5 2017-01-01    54 male        1807 floors or flooring materials            
+##  6 2017-01-01    21 male        1884 ceilings and walls (part of completed st
+##  7 2017-01-01    35 female      1807 floors or flooring materials            
+##  8 2017-01-01    62 female      4074 chairs, other or not specified          
+##  9 2017-01-01    22 male        4076 beds or bedframes, other or not spec    
+## 10 2017-01-01    58 female      1842 stairs or steps                         
+## # … with 255,054 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; inner join
+
+Now we only get the rows where we have matches in both tables
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;%
+    count(age, sex, wt = weight) %&gt;% 
+  inner_join(population, by = c('age', 'sex'))
+```
+
+```
+## # A tibble: 170 × 4
+##      age sex         n population
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+##  1     0 female  3714.    1924145
+##  2     0 male    3981.    2015150
+##  3     1 female 12155.    1943534
+##  4     1 male   12898.    2031718
+##  5     2 female  6949.    1965150
+##  6     2 male    9730.    2056625
+##  7     3 female  4542.    1956281
+##  8     3 male    8404.    2050474
+##  9     4 female  3618.    1953782
+## 10     4 male    4845.    2042001
+## # … with 160 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; right join
+
+Here we get all rows of `population` with the matches from `count()`
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;% 
+    count(age, sex, wt = weight) %&gt;% 
+  right_join(population, by = c('age', 'sex'))
+```
+
+```
+## # A tibble: 170 × 4
+##      age sex         n population
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+##  1     0 female  3714.    1924145
+##  2     0 male    3981.    2015150
+##  3     1 female 12155.    1943534
+##  4     1 male   12898.    2031718
+##  5     2 female  6949.    1965150
+##  6     2 male    9730.    2056625
+##  7     3 female  4542.    1956281
+##  8     3 male    8404.    2050474
+##  9     4 female  3618.    1953782
+## 10     4 male    4845.    2042001
+## # … with 160 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; outer join
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;% 
+    count(age, sex, wt = weight) %&gt;% 
+  full_join(population, by = c('age', 'sex'))
+```
+
+```
+## # A tibble: 204 × 4
+##      age sex         n population
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+##  1     0 female  3714.    1924145
+##  2     0 male    3981.    2015150
+##  3     1 female 12155.    1943534
+##  4     1 male   12898.    2031718
+##  5     2 female  6949.    1965150
+##  6     2 male    9730.    2056625
+##  7     3 female  4542.    1956281
+##  8     3 male    8404.    2050474
+##  9     4 female  3618.    1953782
+## 10     4 male    4845.    2042001
+## # … with 194 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; semi join
+
+Here we keep rows of `count` **with** a match in `population`, but we don't pull in columns from `population`
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;% 
+    count(age, sex, wt = weight) %&gt;% 
+  semi_join(population, by = c('age', 'sex'))
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex         n
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
+##  1     0 female  3714.
+##  2     0 male    3981.
+##  3     1 female 12155.
+##  4     1 male   12898.
+##  5     2 female  6949.
+##  6     2 male    9730.
+##  7     3 female  4542.
+##  8     3 male    8404.
+##  9     4 female  3618.
+## 10     4 male    4845.
+## # … with 160 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+
+---
+
+# ER injuries &amp;mdash; anti join
+
+Here we keep only the rows of `count` **without** a match in `population`
+
+.row[
+
+.col-6[
+
+```r
+selected %&gt;% 
+    count(age, sex, wt = weight) %&gt;% 
+  anti_join(population, by = c('age', 'sex'))
+```
+
+```
+## # A tibble: 34 × 3
+##      age sex        n
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+##  1    85 female 3767.
+##  2    85 male   2485.
+##  3    86 female 4492.
+##  4    86 male   2409.
+##  5    87 female 4407.
+##  6    87 male   2833.
+##  7    88 female 3289.
+##  8    88 male   1706.
+##  9    89 female 2796.
+## 10    89 male   2050.
+## # … with 24 more rows
+```
+]
+
+.col-6[
+
+```r
+population
+```
+
+```
+## # A tibble: 170 × 3
+##      age sex    population
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1     0 female    1924145
+##  2     0 male      2015150
+##  3     1 female    1943534
+##  4     1 male      2031718
+##  5     2 female    1965150
+##  6     2 male      2056625
+##  7     3 female    1956281
+##  8     3 male      2050474
+##  9     4 female    1953782
+## 10     4 male      2042001
+## # … with 160 more rows
+```
+]
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
