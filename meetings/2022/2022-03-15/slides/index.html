@@ -742,7 +742,9 @@ Reads delimited data and will deduce the delimiter for you
 .smaller[
 
 ```r
-health &lt;- vroom::vroom(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+## health &lt;- vroom::vroom(here('data', 'medicare-healthcare-providers', 'Healthcare Providers.csv'))
+hp_url &lt;- "https://bit.ly/cvrug-providers"
+health &lt;- vroom::vroom(hp_url)
 ```
 
 ```
@@ -956,7 +958,9 @@ All verbs work in the same way, providing a consistent workflow with known outpu
 
 
 ```r
-disease &lt;- read_csv(here('data', 'gbd', 'gbd.csv'))
+burden_url &lt;- "https://bit.ly/cvrug-burden"
+# disease &lt;- read_csv(here('data', 'gbd', 'gbd.csv'))
+disease &lt;- read_csv(burden_url)
 ```
 
 
@@ -1380,9 +1384,12 @@ class: inverse middle center subsection
 
 # Tidy data
 
-&gt; Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &amp;ndash; **Hadley Wickham**
+&gt; Tidy datasets provide a standardized way to link the structure of a dataset
+(its physical layout) with its semantics (its meaning). &amp;ndash; **Hadley
+Wickham**
 
-A way to arrange data that facilitates subsequent exploration, transformation, visualization, &amp; modelling of the data where
+A way to arrange data that facilitates subsequent exploration, transformation,
+visualization, &amp; modelling of the data where
 
 * each column is a variable
 * each row is observation
@@ -1420,9 +1427,11 @@ Look at an alternative way of storing the GBD data
 
 # Wide or long?
 
-The data are also in what we call wide format &amp;mdash; where multiple observations are in a row
+The data are also in what we call wide format &amp;mdash; where multiple
+observations are in a row
 
-To fit a statistical model we need them in long format &amp;mdash; where each row corresponds to a single observation
+To fit a statistical model we need them in long format &amp;mdash; where each row
+corresponds to a single observation
 
 ---
 
@@ -1706,7 +1715,8 @@ Two types of *key*
 2. **Foreign key** &amp;mdash; uniquely identifies an observation in another table
     `flights$tailnum`
 
-*Surrogate keys* are keys that are created when a table doesn't have one or more variables that uniquely identify an observation
+*Surrogate keys* are keys that are created when a table doesn't have one or
+more variables that uniquely identify an observation
 
 
 ```r
@@ -1896,7 +1906,9 @@ ER injuries data set consists of three tables of data
 
 
 ```r
-injuries &lt;- vroom::vroom('data/er-injuries/injuries.tsv.gz')
+# injuries &lt;- vroom::vroom('data/er-injuries/injuries.tsv.gz')
+download.file("https://bit.ly/cvrug-er-injuries", destfile = "injuries.tsv.gz")
+injuries &lt;- vroom::vroom("injuries.tsv.gz", delim = "\t")
 injuries
 ```
 
@@ -1924,7 +1936,8 @@ injuries
 
 
 ```r
-products &lt;- vroom::vroom('data/er-injuries/products.tsv')
+# products &lt;- vroom::vroom('data/er-injuries/products.tsv')
+products &lt;- vroom::vroom("https://bit.ly/cvrug-er-products")
 products
 ```
 
@@ -1951,7 +1964,8 @@ products
 
 
 ```r
-population &lt;- vroom::vroom('data/er-injuries/population.tsv')
+# population &lt;- vroom::vroom('data/er-injuries/population.tsv')
+population &lt;- vroom::vroom("https://bit.ly/cvrug-er-population")
 population
 ```
 
