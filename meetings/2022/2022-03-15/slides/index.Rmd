@@ -258,7 +258,7 @@ A meta package that installs a core set of the tidyverse packages
 Addresses stages in the data science workflow
 
 ```{r r4ds-data-science-img, echo = FALSE, fig.align = 'center'}
-knitr::include_graphics(here('resources', 'r4ds-data-science.png'))
+knitr::include_graphics("./resources/r4ds-data-science.png")
 ```
 
 .references[Wickham & Grolemund (2017) [R for Data Science](https://r4ds.had.co.nz/)]
@@ -1108,7 +1108,7 @@ weather
 .col-12[
 .center[
 ```{r echo = FALSE, out.width = '90%'}
-knitr::include_graphics(here('resources', 'relational-nycflights.png'))
+knitr::include_graphics("./resources/relational-nycflights.png")
 ```
 ]
 ]
@@ -1155,7 +1155,7 @@ class: inverse center middle big-subsection
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-setup.png'))
+knitr::include_graphics("./resources/join-setup.png")
 ```
 ]
 ]
@@ -1169,7 +1169,7 @@ knitr::include_graphics(here('resources', 'join-setup.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-setup2.png'))
+knitr::include_graphics("./resources/join-setup2.png")
 ```
 ]
 ]
@@ -1183,7 +1183,7 @@ knitr::include_graphics(here('resources', 'join-setup2.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-inner.png'))
+knitr::include_graphics("./resources/join-inner.png")
 ```
 ]
 ]
@@ -1197,7 +1197,7 @@ knitr::include_graphics(here('resources', 'join-inner.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-inner.png'))
+knitr::include_graphics("./resources/join-inner.png")
 ```
 ]
 ]
@@ -1221,7 +1221,7 @@ knitr::include_graphics(here('resources', 'join-inner.png'))
 ]
 .col-4[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-outer.png'))
+knitr::include_graphics("./resources/join-outer.png")
 ```
 ]
 ]
@@ -1235,7 +1235,7 @@ knitr::include_graphics(here('resources', 'join-outer.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-outer-left.png'))
+knitr::include_graphics("./resources/join-outer-left.png")
 ```
 ]
 ]
@@ -1249,7 +1249,7 @@ knitr::include_graphics(here('resources', 'join-outer-left.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-outer-right.png'))
+knitr::include_graphics("./resources/join-outer-right.png")
 ```
 ]
 ]
@@ -1263,7 +1263,7 @@ knitr::include_graphics(here('resources', 'join-outer-right.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-outer-full.png'))
+knitr::include_graphics("./resources/join-outer-full.png")
 ```
 ]
 ]
@@ -1277,7 +1277,7 @@ knitr::include_graphics(here('resources', 'join-outer-full.png'))
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-venn.png'))
+knitr::include_graphics("./resources/join-venn.png")
 ```
 ]
 ]
@@ -1298,7 +1298,7 @@ Semi joins **keep** all observations in `x` that have a match in `y`
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-semi.png'))
+knitr::include_graphics("./resources/join-semi.png")
 ```
 ]
 ]
@@ -1314,7 +1314,7 @@ Filtering joins never duplicate rows unlike mutating joins
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-semi-many.png'))
+knitr::include_graphics("./resources/join-semi-many.png")
 ```
 ]
 ]
@@ -1330,7 +1330,7 @@ Anti joins **drop** all observations in `x` that have a match in `y`
 .row[
 .col-12[
 ```{r echo = FALSE}
-knitr::include_graphics(here('resources', 'join-anti.png'))
+knitr::include_graphics("./resources/join-anti.png")
 ```
 ]
 ]
