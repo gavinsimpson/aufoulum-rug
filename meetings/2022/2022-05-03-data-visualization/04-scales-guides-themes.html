@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Scales, guides, and themes</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gavin Simpson" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/all.css" type="text/css" />
+    <link rel="stylesheet" href="css/slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: inverse, middle, left, my-title-slide, title-slide
+
+.title[
+# Scales, guides, and themes
+]
+.subtitle[
+## Data Visualization: Part 4
+]
+.author[
+### Gavin Simpson
+]
+
+---
+
+
+
+
+background-image: url('./resources/franki-chamaki-694946-unsplash.jpg')
+background-size: cover
+
+---
+
+# Data
+
+In this video we'll use the `gapminder` data set from the previous video.
+
+We'll also make use of a subset of the General Social Survey data set
+
+
+```r
+library('gapminder')
+library('ggplot2')
+## load some new data
+load(url('http://bit.ly/gss_data'))
+ls()
+```
+
+```
+## [1] "gss_sm"
+```
+
+---
+
+# General Social Survey 2016
+
+The GSS is a long-running survey of American adults
+
+`gss_sm` is a small subset of the full GSS for 2016
+
+.smaller[
+
+```
+## # A tibble: 6 × 32
+##    year    id ballot   age childs sibs  degree race  sex   region income16 relig
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;labe&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;lab&gt; &lt;fct&gt;  &lt;fct&gt; &lt;fct&gt; &lt;fct&gt;  &lt;fct&gt;    &lt;fct&gt;
+## 1  2016     1 1         47      3 2     Bache… White Male  New E… $170000… None 
+## 2  2016     2 2         61      0 3     High … White Male  New E… $50000 … None 
+## 3  2016     3 3         72      2 3     Bache… White Male  New E… $75000 … Cath…
+## 4  2016     4 1         43      4 3     High … White Fema… New E… $170000… Cath…
+## 5  2016     5 3         55      2 2     Gradu… White Fema… New E… $170000… None 
+## 6  2016     6 2         53      2 2     Junio… White Fema… New E… $60000 … None 
+## # … with 20 more variables: marital &lt;fct&gt;, padeg &lt;fct&gt;, madeg &lt;fct&gt;,
+## #   partyid &lt;fct&gt;, polviews &lt;fct&gt;, happy &lt;fct&gt;, partners &lt;fct&gt;, grass &lt;fct&gt;,
+## #   zodiac &lt;fct&gt;, pres12 &lt;labelled&gt;, wtssall &lt;dbl&gt;, income_rc &lt;fct&gt;,
+## #   agegrp &lt;fct&gt;, ageq &lt;fct&gt;, siblings &lt;fct&gt;, kids &lt;fct&gt;, religion &lt;fct&gt;,
+## #   bigregion &lt;fct&gt;, partners_rc &lt;fct&gt;, obama &lt;dbl&gt;
+```
+]
+
+---
+
+## Scales, guides, and themes
+
+* **Scale**
+    Every aesthetic has a scale &amp;mdash; if you want to adjust the scale use a `scale_` function
+* **Guide**
+    Many scales are linked with a legend or a *guide* &amp;mdash; if you want to adjust these use the `guides()` function
+* **Theme**
+    Plots comprise a number of features that are not directly related to the data
+    * grid lines
+    * background
+    * legend placement
+    * typeface
+    To adjust these features use the `theme()` function or a pre-set theme e.g. `theme_bw()`
+
+---
+background-image: url('./resources/helena-lopes-459331-unsplash.jpg')
+background-size: cover
+
+# Scales
+
+.footnote[
+&lt;a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &amp;quot;San Francisco&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Helvetica, Ubuntu, Roboto, Noto, &amp;quot;Segoe UI&amp;quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" href="https://unsplash.com/@wildlittlethingsphoto?utm_medium=referral&amp;amp;utm_campaign=photographer-credit&amp;amp;utm_content=creditBadge" target="_blank" rel="noopener noreferrer" title="Download free do whatever you want high-resolution photos from Helena Lopes"&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32"&gt;&lt;title&gt;unsplash-logo&lt;/title&gt;&lt;path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/span&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;Helena Lopes&lt;/span&gt;&lt;/a&gt;
+]
+
+---
+
+# Scales
+
+
+```r
+ggplot(gapminder, aes(x = continent, y = gdpPercap)) + geom_boxplot()
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-1-1.svg)&lt;!-- --&gt;
+
+---
+
+# Scales
+
+
+```r
+ggplot(gapminder, aes(x = continent, y = gdpPercap)) + geom_boxplot() + 
+* scale_y_log10(labels = scales::dollar) + coord_flip()
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-2-1.svg)&lt;!-- --&gt;
+
+---
+
+# Scales
+
+
+
+```r
+ggplot(gapminder, aes(x = continent, y = gdpPercap)) + geom_boxplot() + 
+  scale_y_log10(labels = scales::dollar) + coord_flip() + 
+  scale_x_discrete(labels = LETTERS[1:5])
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-3-1.svg)&lt;!-- --&gt;
+
+---
+
+# Continous colour scales 
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+    geom_point(mapping = aes(colour = log10(pop))) + scale_x_log10()
+```
+
+&lt;img src="04-scales-guides-themes_files/figure-html/scales-4-1.svg" height="400" /&gt;
+
+---
+
+# Continuous colour scales
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+    geom_point(mapping = aes(colour = log10(pop))) + scale_x_log10() + 
+*   scale_colour_viridis_c()
+```
+
+&lt;img src="04-scales-guides-themes_files/figure-html/scales-5-1.svg" height="400" /&gt;
+
+---
+
+# Scales
+
+Each type of mapping has an associated scale
+
+`scale_MAPPING_KIND()`
+
+`scale_x_continuous()` for a continous x-axis scale
+
+`scale_y_discrete()` for a discrete scale
+
+Scales can transform data &amp;mdash; the `trans` argument allows for many popular/common transformations
+
+Scales apply transformation **before** any statistical transformation / calculation
+
+If you want to apply a transformation after the stat use `coord_trans()`
+
+---
+
+# Scales and transforms
+
+
+```r
+ggplot(gapminder, aes(x = continent, y = gdpPercap)) + geom_boxplot() + 
+* scale_y_continuous(trans = 'log10', labels = scales::dollar) + coord_flip()
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-6-1.svg)&lt;!-- --&gt;
+
+---
+
+# Scales and breaks
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + 
+  scale_x_continuous(trans = 'log10', labels = scales::dollar) +
+  scale_y_continuous(breaks = c(35, 65, 83))
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-7-1.svg)&lt;!-- --&gt;
+
+---
+
+# Scales and names
+
+
+```r
+lab &lt;- c('NE','MW','S','W')
+ggplot(gss_sm, aes(x = bigregion, fill = bigregion)) + geom_bar() +
+  scale_fill_discrete(name = 'Region', labels = lab) + 
+  scale_x_discrete(labels = lab)
+```
+
+![](04-scales-guides-themes_files/figure-html/scales-8-1.svg)&lt;!-- --&gt;
+
+---
+background-image: url('./resources/helena-lopes-459331-unsplash.jpg')
+background-size: cover
+
+# Guides
+
+.footnote[
+&lt;a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &amp;quot;San Francisco&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Helvetica, Ubuntu, Roboto, Noto, &amp;quot;Segoe UI&amp;quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" href="https://unsplash.com/@wildlittlethingsphoto?utm_medium=referral&amp;amp;utm_campaign=photographer-credit&amp;amp;utm_content=creditBadge" target="_blank" rel="noopener noreferrer" title="Download free do whatever you want high-resolution photos from Helena Lopes"&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32"&gt;&lt;title&gt;unsplash-logo&lt;/title&gt;&lt;path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/span&gt;&lt;span style="display:inline-block;padding:2px 3px"&gt;Helena Lopes&lt;/span&gt;&lt;/a&gt;
+]
+
+---
+
+# Guides &amp;mdash; offer finer control over legends
+
+Add to the plot using the `guides()` function
+
+`guide_legend()` is for discrete legends
+
+`guide_colourbar()` is for continuous colour ranges
+---
+
+# Guides &amp;mdash; offer finer control over legends
+
+
+```r
+lab &lt;- c('NE','MW','S','W')
+ggplot(gss_sm, aes(x = bigregion, fill = bigregion)) + geom_bar() +
+  scale_fill_discrete(labels = lab) + scale_x_discrete(labels = lab) +
+  guides(fill = FALSE)
+```
+
+![](04-scales-guides-themes_files/figure-html/guides-1-1.svg)&lt;!-- --&gt;
+
+---
+
+# Guides &amp;mdash; offer finer control over legends
+
+
+```r
+ggplot(gss_sm, aes(x = bigregion, fill = bigregion)) + geom_bar() +
+  scale_fill_discrete(labels = lab) + scale_x_discrete(labels = lab) +
+  guides(fill = guide_legend(ncol = 2, byrow = TRUE))
+```
+
+![](04-scales-guides-themes_files/figure-html/guides-2-1.svg)&lt;!-- --&gt;
+
+---
+
+# Guides &amp;mdash; offer finer control over legends
+
+
+```r
+ggplot(gss_sm, aes(x = bigregion, fill = bigregion)) + geom_bar() +
+  scale_fill_discrete(labels = lab) + scale_x_discrete(labels = lab) +
+  guides(fill = guide_legend(reverse = TRUE))
+```
+
+![](04-scales-guides-themes_files/figure-html/guides-3-1.svg)&lt;!-- --&gt;
+
+---
+
+# Guides &amp;mdash; `guide_colourbar()`
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+    geom_point(mapping = aes(colour = log10(pop))) + scale_x_log10() + 
+    guides(colour = guide_colourbar(reverse = FALSE))
+```
+
+&lt;img src="04-scales-guides-themes_files/figure-html/guides-4-1.svg" height="400" /&gt;
+
+---
+
+# Guides &amp;mdash; `guide_colourbar()`
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+    geom_point(mapping = aes(colour = log10(pop))) + scale_x_log10() + 
+    guides(colour = guide_colourbar(reverse = TRUE))
+```
+
+&lt;img src="04-scales-guides-themes_files/figure-html/guides-4b-1.svg" height="400" /&gt;
+
+---
+
+# Guides &amp;mdash; `guide_colourbar()`
+
+
+```r
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+    geom_point(mapping = aes(colour = log10(pop))) + scale_x_log10() + 
+    guides(colour = guide_colourbar(barheight = unit(4, 'cm')))
+```
+
+&lt;img src="04-scales-guides-themes_files/figure-html/guides-5-1.svg" height="400" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

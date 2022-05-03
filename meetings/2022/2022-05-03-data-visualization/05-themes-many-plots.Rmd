@@ -1,0 +1,374 @@
+---
+title: "Themes & Combining plots"
+subtitle: "Data Visualization: Part 5"
+author: "Gavin Simpson"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', './css/all.css', './css/slides.css']
+    lib_dir: libs
+    nature:
+      titleSlideClass: ['inverse','middle','left',my-title-slide]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: 'macros.js'
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE, cache = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE, dev = 'svg', echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.height=6, fig.width = 1.777777*6)
+library('ggplot2')
+library('dplyr')
+library('tidyr')
+library('colorspace')
+library('cowplot')
+library('gapminder')
+theme_set(theme_grey())
+```
+
+background-image: url('./resources/franki-chamaki-694946-unsplash.jpg')
+background-size: cover
+
+---
+
+# Data
+
+In this video we'll use the `gapminder` data set from the previous video.
+
+We'll also make use of a new package **cowplot**
+
+```{r catch-up-code, eval = FALSE}
+library('gapminder')
+library('ggplot2')
+
+install.packages("cowplot")
+```
+
+---
+
+## Scales, guides, and themes
+
+* **Scale**
+    Every aesthetic has a scale &mdash; if you want to adjust the scale use a `scale_` function
+* **Guide**
+    Many scales are linked with a legend or a *guide* &mdash; if you want to adjust these use the `guides()` function
+* **Theme**
+    Plots comprise a number of features that are not directly related to the data
+    * grid lines
+    * background
+    * legend placement
+    * typeface
+    
+	To adjust these features use the `theme()` function or a pre-set theme e.g. `theme_bw()`
+
+---
+background-image: url('./resources/helena-lopes-459331-unsplash.jpg')
+background-size: cover
+
+# Themes
+
+.footnote[
+<a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" href="https://unsplash.com/@wildlittlethingsphoto?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge" target="_blank" rel="noopener noreferrer" title="Download free do whatever you want high-resolution photos from Helena Lopes"><span style="display:inline-block;padding:2px 3px"><svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32"><title>unsplash-logo</title><path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z"></path></svg></span><span style="display:inline-block;padding:2px 3px">Helena Lopes</span></a>
+]
+
+---
+
+# Themes
+
+The *ggplot2* theme system allows control over the non-data elements of a plot
+
+* fonts / typeface
+* ticks & grid lines
+* panel strips
+* backgrounds
+* legends
+
+In *ggplot2*, we create a plot by deciding how the data is displayed
+
+The *theme* controls how it looks *when* you display it
+
+---
+
+# Themes
+
+Four main components to themes
+
+1. Theme **elements** specify the non-data elements you can control
+
+    * `plot.title`, `axis.ticks.x`, `legend.key.height`
+
+2. Each element is associated with an **element function**
+
+    * `element_text()` sets the font size, colour, & typeface of text elements
+
+3. The `theme()` function allows you to overrid the default theme elements
+
+    * `+ theme(plot.title = element_text(colour = "red"))`
+
+4. Complete **themes** set all of the theme elements to values designed to wokr together
+
+    * `theme_grey()`, `theme_bw()`, `theme_minimal()`, &hellip;
+
+---
+
+# Base plot
+
+```{r themes-1, fig.width = 7, fig.height = 4, dpi = 200, fig.keep = "none"}
+base <- ggplot(mpg, aes(cty, hwy, colour = factor(cyl))) +
+  geom_jitter() +
+  geom_abline(colour = "grey50", size = 2)
+base
+```
+
+---
+
+# Base plot
+```{r themes-1a, fig.width = 7, fig.height = 4, dpi = 200, ref.label = "themes-1", echo = FALSE}
+```
+
+---
+
+# Add some labels
+
+```{r themes-2, fig.width = 7, fig.height = 5, dpi = 200, fig.keep = "none"}
+labelled <- base +
+  labs(x = "City mileage/gallon",
+       y = "Highway mileage/gallon",
+       colour = "Cylinders",
+       title = "Highway and city mileage are highly correlated") +
+  scale_colour_brewer(type = "seq", palette = "Spectral")
+labelled  
+```
+
+---
+
+# Add some labels
+```{r themes-2a, fig.width = 7, fig.height = 4, dpi = 200, ref.label = "themes-2", echo = FALSE}
+```
+
+---
+
+# Style the plot with `theme()`
+
+```{r themes-3, fig.width = 7, fig.height = 5, dpi = 200, fig.keep = "none"}
+styled <- labelled +
+  theme(plot.title = element_text(face = "bold", size = 12),
+        legend.background = element_rect(fill = "white", size = 4,
+                                         colour = "white"),
+        legend.justification = c(0,1),
+        legend.position = c(0,1),
+        axis.ticks = element_line(colour = "grey70", size = 0.2),
+        panel.grid.major = element_line(colour = "grey70", size = 0.2),
+        panel.grid.minor = element_blank())
+styled
+```
+
+---
+
+# Style the plot with `theme()`
+```{r themes-3a, fig.width = 7, fig.height = 4, dpi = 200, ref.label = "themes-3", echo = FALSE}
+```
+
+---
+
+# Complete themes
+
+**ggplot2** comes with many in-built themes & add-on packages provide many more
+
+`theme_grey()` is the default theme
+
+* light grey background with white gridlines
+* the data are at the fore, grid lines allow for comparison
+* the grid lines are subtle, have little visual impact
+* grey background is similar in colour to blocks of text in long documents &mdash; graphics fit in with the text
+* grey background provides a continuous field of colour &mdash; the plot is perceived as a single entity
+
+Add on packages: **ggthemes**
+---
+
+# In-built themes
+
+There are seven additional in-built themes
+
+1. `theme_bw()`
+2. `theme_line_draw()`
+3. `theme_light()`
+4. `theme_dark()`
+5. `theme_minimal()`
+6. `theme_classic()`
+7. `theme_void()`
+
+---
+
+# In-built themes 1
+
+```{r in-built-themes-1, fig.width = 7, fig.height = 3, dpi = 200, echo = FALSE}
+df <- data.frame(x = 1:3, y = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_point()
+p1 <- base + theme_grey() + ggtitle("theme_grey()")
+p2 <- base + theme_bw() + ggtitle("theme_bw()")
+p3 <- base + theme_linedraw() + ggtitle("theme_linedraw()")
+plot_grid(p1, p2, p3, ncol = 3)
+```
+
+---
+
+# In-built themes 2
+
+```{r in-built-themes-2, fig.width = 7, fig.height = 3, dpi = 200, echo = FALSE}
+p4 <- base + theme_light() + ggtitle("theme_light()")
+p5 <- base + theme_dark() + ggtitle("theme_dark()")
+p6 <- base + theme_minimal() + ggtitle("theme_minimal()")
+plot_grid(p4, p5, p6, ncol = 3)
+```
+
+---
+
+# In-built themes 3
+
+```{r in-built-themes-3, fig.width = 7, fig.height = 3, dpi = 200, echo = FALSE}
+p7 <- base + theme_classic() + ggtitle("theme_classic()")
+p8 <- base + theme_void() + ggtitle("theme_void()")
+plot_grid(p7, p8, NULL, ncol = 3)
+```
+
+---
+
+# Using a complete theme
+
+```{r in-built-themes-4, fig.width = 7, fig.height = 3.5, dpi = 200}
+labelled + theme_minimal()
+```
+
+---
+
+# Setting the theme for the entire session
+
+To set the theme permanently for the session use `theme_set()`
+
+```{r in-built-themes-5, fig.width = 5, fig.height = 4, dpi = 200, fig.show = "hold", dev = 'svg', out.width = "500cm", out.height = "400cm"}
+labelled
+theme_set(theme_bw())
+labelled
+```
+
+---
+
+# Modifying theme components
+
+To modify an individual theme component you add `+ theme(...)` to a plot:
+
+`plot + theme(element.name = element.function())`
+
+Four basic types of built-in elements
+
+1. text
+2. lines
+3. rectangles,
+4. blank
+
+---
+
+# Modifying theme components
+
+* `element_text()` draws labels and headings &mdash; anything text
+
+    * `family`, `face`, `colour`, `size` (pts), `hjust`, `vjust`, `angle` (deg), `lineheight`, `margin`
+
+* `element_line()` draws lines
+
+    * `colour`, `size`, `linetype`
+
+* `element_rect()` draws rectangles, used mostly for backgrounds on plot elements
+
+    * `fill`, `colour`, `size`, `linetype`
+
+* `element_blank()` draws nothing &mdash; use this is you don't want an theme component to be drawn
+
+---
+
+# Modifying theme components
+
+```{r modify-1, fig.width = 7, fig.height = 3, dpi = 200}
+df <- data.frame(x = 1:3, y = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_point() + ggtitle("This is a ggplot")
+
+base + theme(plot.title = element_text(size = 16, face = "bold",
+                                       colour = "red", hjust = 1))
+```
+
+---
+
+# Modifying theme components
+
+```{r modify-2, fig.width = 7, fig.height = 3, dpi = 200}
+base + theme(plot.title = element_text(margin = margin(t = 10, b = 20)))
+```
+
+---
+
+# Modifying theme components
+
+```{r modify-3, fig.width = 7, fig.height = 3, dpi = 200}
+base + theme(panel.grid.major = element_line(colour = "red", size = 2),
+             panel.grid.minor = element_line(linetype = "dashed",
+                                             colour = "blue"))
+```
+
+---
+
+# Modifying theme components
+
+```{r modify-4, fig.width = 7, fig.height = 3, dpi = 200, fig.show = "hold", dev = 'svg', out.width = "500cm", out.height = "400cm"}
+base + theme(plot.background = element_rect(colour = "red", fill = "grey80"))
+base + theme(panel.background = element_rect(fill = "linen", colour = "red"))
+```
+
+---
+
+# Multiple plots
+
+There are a number of ways to produce a figure with multiple separate panels
+
+* the **cowplot** package is the one I use most
+* **patchwork** looks easier but not on CRAN yet
+
+When you load **cowplot** it also loads an **opinionated** theme &mdash; reset
+
+```{r cowplot-1}
+library("cowplot")
+theme_set(theme_grey())
+```
+
+---
+
+# Multiple plots
+
+**cowplot** works by taking multiple pre-prepared plots and arranging them on the device
+
+Can set the number of columns and rows to spread the plots over and align certain axes
+
+```{r cowplot-2, fig.width = 14, fig.height = 7, dpi = 200}
+## plot 1
+p1 <- base + theme(plot.title = element_text(margin = margin(t = 10, b = 20)))
+## plot 2
+p2 <- base + theme(panel.grid.major = element_line(colour = "red", size = 2),
+                   panel.grid.minor = element_line(linetype = "dashed",
+                                                   colour = "blue"))
+## plot 3
+p3 <- base + theme(plot.background = element_rect(colour = "red", fill = "grey80"))
+## plot 4
+p4 <- base + theme(panel.background = element_rect(fill = "linen", colour = "red"))
+```
+
+---
+
+# Multiple plots
+
+Then arrange the plots using `plot_grid()`
+
+```{r cowplot-3, fig.width = 10.5, fig.height = 4.5, dpi = 200}
+plot_grid(p1, p2, p3, p4, ncol = 2, labels = "auto", align = 'hv', axis = 'lrtb')
+```
