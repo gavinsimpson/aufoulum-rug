@@ -134,7 +134,22 @@ ggplot(gapminder, aes(x = year, y = gdpPercap)) + geom_line(aes(group = country)
 
 # The `group` aesthetic
 
+Override the `group` aesthetic if you don't want geoms at group level
+
+
+```r
+ggplot(gapminder, aes(x = year, y = gdpPercap)) + geom_line(aes(group = country)) +
+  geom_smooth(aes(group = 1))
+```
+
+![](03-groups-facets-stats_files/figure-html/right-2-1.svg)&lt;!-- --&gt;
+
+---
+
+# Overriding the `group` aesthetic
+
 Use the `group` aesthetic when structure in the data isn't already mapped to an aesthetic
+
 
 ---
 
