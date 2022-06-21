@@ -35,7 +35,7 @@ background-size: cover
 
 # Data
 
-In this video we'll use the `gapminder` data set from the previous video.
+In this lesson we'll use the `gapminder` data set from the previous lesson.
 
 We'll also make use of a subset of the General Social Survey data set
 

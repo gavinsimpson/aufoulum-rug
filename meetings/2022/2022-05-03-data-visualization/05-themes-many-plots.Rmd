@@ -23,8 +23,10 @@ library('ggplot2')
 library('dplyr')
 library('tidyr')
 library('colorspace')
-library('cowplot')
+library('patchwork')
 library('gapminder')
+library("ggbeeswarm")
+library("ggdist")
 theme_set(theme_grey())
 ```
 
@@ -35,15 +37,17 @@ background-size: cover
 
 # Data
 
-In this video we'll use the `gapminder` data set from the previous video.
+In this video we'll use the `gapminder` data set from the previous meetings
 
-We'll also make use of a new package **cowplot**
+We'll also make use of a new package **patchwork**
 
 ```{r catch-up-code, eval = FALSE}
 library('gapminder')
 library('ggplot2')
 
-install.packages("cowplot")
+install.packages("patchwork")
+install.packages("ggbeeswarm")
+install.packages("ggdist")
 ```
 
 ---
@@ -139,7 +143,7 @@ labelled <- base +
        colour = "Cylinders",
        title = "Highway and city mileage are highly correlated") +
   scale_colour_brewer(type = "seq", palette = "Spectral")
-labelled  
+labelled
 ```
 
 ---
@@ -210,7 +214,7 @@ base <- ggplot(df, aes(x, y)) + geom_point()
 p1 <- base + theme_grey() + ggtitle("theme_grey()")
 p2 <- base + theme_bw() + ggtitle("theme_bw()")
 p3 <- base + theme_linedraw() + ggtitle("theme_linedraw()")
-plot_grid(p1, p2, p3, ncol = 3)
+p1 + p2 + p3 + plot_layout(ncol = 3)
 ```
 
 ---
@@ -221,7 +225,7 @@ plot_grid(p1, p2, p3, ncol = 3)
 p4 <- base + theme_light() + ggtitle("theme_light()")
 p5 <- base + theme_dark() + ggtitle("theme_dark()")
 p6 <- base + theme_minimal() + ggtitle("theme_minimal()")
-plot_grid(p4, p5, p6, ncol = 3)
+p4 + p5 + p6 + plot_layout(ncol = 3)
 ```
 
 ---
@@ -231,7 +235,7 @@ plot_grid(p4, p5, p6, ncol = 3)
 ```{r in-built-themes-3, fig.width = 7, fig.height = 3, dpi = 200, echo = FALSE}
 p7 <- base + theme_classic() + ggtitle("theme_classic()")
 p8 <- base + theme_void() + ggtitle("theme_void()")
-plot_grid(p7, p8, NULL, ncol = 3)
+p7 + p8 + plot_layout(ncol = 3)
 ```
 
 ---
@@ -248,10 +252,14 @@ labelled + theme_minimal()
 
 To set the theme permanently for the session use `theme_set()`
 
-```{r in-built-themes-5, fig.width = 5, fig.height = 4, dpi = 200, fig.show = "hold", dev = 'svg', out.width = "500cm", out.height = "400cm"}
+```{r in-built-themes-5, fig.width = 5, fig.height = 4, dpi = 200, fig.show = "hide", dev = 'svg', out.width = "500cm", out.height = "400cm"}
 labelled
 theme_set(theme_bw())
 labelled
+```
+
+```{r fake-theme-example-5, fig.width = 10, fig.height = 4, echo = FALSE}
+labelled + (labelled + theme_bw())
 ```
 
 ---
@@ -332,21 +340,18 @@ base + theme(panel.background = element_rect(fill = "linen", colour = "red"))
 
 There are a number of ways to produce a figure with multiple separate panels
 
-* the **cowplot** package is the one I use most
-* **patchwork** looks easier but not on CRAN yet
-
-When you load **cowplot** it also loads an **opinionated** theme &mdash; reset
+* the **cowplot** package is the one I **used to** use most
+* **patchwork** is easier and is now on CRAN
 
 ```{r cowplot-1}
-library("cowplot")
-theme_set(theme_grey())
+library("patchwork")
 ```
 
 ---
 
 # Multiple plots
 
-**cowplot** works by taking multiple pre-prepared plots and arranging them on the device
+**patchwork** works by taking multiple pre-prepared plots and arranging them on the device
 
 Can set the number of columns and rows to spread the plots over and align certain axes
 
@@ -370,5 +375,63 @@ p4 <- base + theme(panel.background = element_rect(fill = "linen", colour = "red
 Then arrange the plots using `plot_grid()`
 
 ```{r cowplot-3, fig.width = 10.5, fig.height = 4.5, dpi = 200}
-plot_grid(p1, p2, p3, p4, ncol = 2, labels = "auto", align = 'hv', axis = 'lrtb')
+p1 + p2 + p3 + p4 + plot_layout(ncol = 2) + plot_annotation(tag_levels = "A")
 ```
+
+---
+
+# Violin plots
+
+Alternative to boxplots
+
+```{r violin-gapminder-1, fig.width = 10.5, fig.height = 4.5}
+ggplot(gapminder, aes(y = lifeExp, x = continent, fill = continent)) +
+  geom_violin()
+```
+
+---
+
+# Violin plots
+
+```{r violin-gapminder-2, fig.width = 10.5, fig.height = 4.5}
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_violin() +
+  geom_boxplot(width = 0.3)
+```
+
+---
+
+# Violin plots
+
+```{r violin-gapminder-3, fig.width = 10.5, fig.height = 4.5}
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_violin() +
+  geom_point(alpha = 0.1, position = position_jitter(height = 0.1))
+```
+
+---
+
+# Beeswarm plots
+
+```{r beeswarm, fig.width = 10.5, fig.height = 4.5}
+library("ggbeeswarm")
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_beeswarm(groupOnX = TRUE)
+```
+---
+
+# Beeswarm plots
+
+```{r beeswarm-2, fig.width = 10.5, fig.height = 4.5}
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_quasirandom(groupOnX = TRUE)
+```
+
+---
+
+# Raincloud plots
+
+```{r raincloud, fig.width = 10.5, fig.height = 4.5}
+ggplot(gapminder, aes(y = lifeExp, x = continent)) + 
+  ggdist::stat_halfeye(aes(fill = continent), adjust = .5, width = .75, .width = c(0.5, 1)) + 
+  ggdist::stat_dots(side = "left", dotsize = 0.3, justification = 1.05, binwidth = 1)

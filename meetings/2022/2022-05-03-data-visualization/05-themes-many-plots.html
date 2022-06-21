@@ -35,16 +35,18 @@ background-size: cover
 
 # Data
 
-In this video we'll use the `gapminder` data set from the previous video.
+In this video we'll use the `gapminder` data set from the previous meetings
 
-We'll also make use of a new package **cowplot**
+We'll also make use of a new package **patchwork**
 
 
 ```r
 library('gapminder')
 library('ggplot2')
 
-install.packages("cowplot")
+install.packages("patchwork")
+install.packages("ggbeeswarm")
+install.packages("ggdist")
 ```
 
 ---
@@ -141,7 +143,7 @@ labelled &lt;- base +
        colour = "Cylinders",
        title = "Highway and city mileage are highly correlated") +
   scale_colour_brewer(type = "seq", palette = "Spectral")
-labelled  
+labelled
 ```
 
 ---
@@ -239,11 +241,14 @@ To set the theme permanently for the session use `theme_set()`
 
 ```r
 labelled
+```
+
+```r
 theme_set(theme_bw())
 labelled
 ```
 
-&lt;img src="05-themes-many-plots_files/figure-html/in-built-themes-5-1.svg" width="500cm" height="400cm" /&gt;&lt;img src="05-themes-many-plots_files/figure-html/in-built-themes-5-2.svg" width="500cm" height="400cm" /&gt;
+![](05-themes-many-plots_files/figure-html/fake-theme-example-5-1.svg)&lt;!-- --&gt;
 
 ---
 
@@ -335,22 +340,19 @@ base + theme(panel.background = element_rect(fill = "linen", colour = "red"))
 
 There are a number of ways to produce a figure with multiple separate panels
 
-* the **cowplot** package is the one I use most
-* **patchwork** looks easier but not on CRAN yet
-
-When you load **cowplot** it also loads an **opinionated** theme &amp;mdash; reset
+* the **cowplot** package is the one I **used to** use most
+* **patchwork** is easier and is now on CRAN
 
 
 ```r
-library("cowplot")
-theme_set(theme_grey())
+library("patchwork")
 ```
 
 ---
 
 # Multiple plots
 
-**cowplot** works by taking multiple pre-prepared plots and arranging them on the device
+**patchwork** works by taking multiple pre-prepared plots and arranging them on the device
 
 Can set the number of columns and rows to spread the plots over and align certain axes
 
@@ -376,10 +378,87 @@ Then arrange the plots using `plot_grid()`
 
 
 ```r
-plot_grid(p1, p2, p3, p4, ncol = 2, labels = "auto", align = 'hv', axis = 'lrtb')
+p1 + p2 + p3 + p4 + plot_layout(ncol = 2) + plot_annotation(tag_levels = "A")
 ```
 
 ![](05-themes-many-plots_files/figure-html/cowplot-3-1.svg)&lt;!-- --&gt;
+
+---
+
+# Violin plots
+
+Alternative to boxplots
+
+
+```r
+ggplot(gapminder, aes(y = lifeExp, x = continent, fill = continent)) +
+  geom_violin()
+```
+
+![](05-themes-many-plots_files/figure-html/violin-gapminder-1-1.svg)&lt;!-- --&gt;
+
+---
+
+# Violin plots
+
+
+```r
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_violin() +
+  geom_boxplot(width = 0.3)
+```
+
+![](05-themes-many-plots_files/figure-html/violin-gapminder-2-1.svg)&lt;!-- --&gt;
+
+---
+
+# Violin plots
+
+
+```r
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_violin() +
+  geom_point(alpha = 0.1, position = position_jitter(height = 0.1))
+```
+
+![](05-themes-many-plots_files/figure-html/violin-gapminder-3-1.svg)&lt;!-- --&gt;
+
+---
+
+# Beeswarm plots
+
+
+```r
+library("ggbeeswarm")
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_beeswarm(groupOnX = TRUE)
+```
+
+![](05-themes-many-plots_files/figure-html/beeswarm-1.svg)&lt;!-- --&gt;
+---
+
+# Beeswarm plots
+
+
+```r
+ggplot(gapminder, aes(y = lifeExp, x = continent, colour = continent)) +
+  geom_quasirandom(groupOnX = TRUE)
+```
+
+![](05-themes-many-plots_files/figure-html/beeswarm-2-1.svg)&lt;!-- --&gt;
+
+---
+
+# Raincloud plots
+
+
+```r
+ggplot(gapminder, aes(y = lifeExp, x = continent)) + 
+  ggdist::stat_halfeye(aes(fill = continent), adjust = .5, width = .75, .width = c(0.5, 1)) + 
+  ggdist::stat_dots(side = "left", dotsize = 0.3, justification = 1.05, binwidth = 1)
+```
+
+![](05-themes-many-plots_files/figure-html/raincloud-1.svg)&lt;!-- --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
